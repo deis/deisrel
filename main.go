@@ -36,6 +36,11 @@ func main() {
 						},
 					},
 				},
+				cli.Command{
+					Name:    "generate-changelogs",
+					Aliases: []string{"gen-ch"},
+					Action:  actions.GenerateChangelogs(ghClient),
+				},
 			},
 		},
 		cli.Command{
