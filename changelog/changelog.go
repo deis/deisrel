@@ -7,28 +7,32 @@ import (
 const (
 	tplStr = `{{.OldRelease}} -> {{.NewRelease}}
 
+{{ if (len .Features) gt 0 }}
 # Features
 
 {{range .Features}} - {{.}}
-{{else}}No new features for this release.
+{{end}}
 {{end}}
 
+{{ if (len .Fixes) gt 0 }}
 # Fixes
 
 {{range .Fixes}} - {{.}}
-{{else}}No bug fixes for this release.
+{{end}}
 {{end}}
 
+{{ if (len .Documentation) gt 0 }}
 # Documentation
 
 {{range .Documentation}} - {{.}}
-{{else}}No new documentation for this release.
+{{end}}
 {{end}}
 
+{{ if (len .Maintenance) gt 0 }}
 # Maintenance
 
 {{range .Maintenance}} - {{.}}
-{{else}}No maintenance required for this release.
+{{end}}
 {{end}}`
 )
 
