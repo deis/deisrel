@@ -43,6 +43,7 @@ var individualChangelogTpl *template.Template = template.Must(template.New("chan
 type IndividualChangelog struct {
 	OldRelease    string
 	NewRelease    string
+	Sha           string
 	Features      []string
 	Fixes         []string
 	Documentation []string
@@ -53,12 +54,13 @@ type IndividualChangelog struct {
 func GenerateIndividualChangelog(client *github.Client, dest io.Writer) func(*cli.Context) error {
 	return func(c *cli.Context) error {
 		repoName := c.Args().Get(0)
-		changelog := &Changelog{
+		changelog := &IndividualChangelog{
 			OldRelease: c.Args().Get(1),
-			NewRelease: c.Args().Get(2),
+			Sha:        c.Args().Get(2),
+			NewRelease: c.Args().Get(3),
 		}
-		if changelog.OldRelease == "" || changelog.NewRelease == "" {
-			log.Fatal("Usage: changelog individual <repo> <old-release> <new-release>")
+		if changelog.OldRelease == "" || changelog.NewRelease == "" || changelog.Sha == "" {
+			log.Fatal("Usage: changelog individual <repo> <old-release> <sha> <new-release>")
 		}
 		if err := generateIndividualChangelog(client, changelog, repoName); err != nil {
 			log.Fatalf("could not generate changelog: %s", err)
@@ -71,8 +73,8 @@ func GenerateIndividualChangelog(client *github.Client, dest io.Writer) func(*cl
 	}
 }
 
-func generateIndividualChangelog(client *github.Client, changelog *Changelog, name string) error {
-	commitCompare, resp, err := client.Repositories.CompareCommits("deis", name, changelog.OldRelease, changelog.NewRelease)
+func generateIndividualChangelog(client *github.Client, changelog *IndividualChangelog, name string) error {
+	commitCompare, resp, err := client.Repositories.CompareCommits("deis", name, changelog.OldRelease, changelog.Sha)
 	if err != nil {
 		if resp.StatusCode == http.StatusNotFound {
 			log.Printf("tag does not exist for this repo; skipping %s", name)
