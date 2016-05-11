@@ -58,7 +58,7 @@ func GenerateChangelog(client *github.Client, dest io.Writer) func(*cli.Context)
 			NewRelease: c.Args().Get(1),
 		}
 		if changelog.OldRelease == "" || changelog.NewRelease == "" {
-			log.Fatal("Usage: generate-changelog <old-release> <new-release>")
+			log.Fatal("Usage: changelog global <old-release> <new-release>")
 		}
 		if err := generateChangelog(client, changelog); err != nil {
 			log.Fatalf("could not generate changelog: %s", err)
@@ -119,26 +119,4 @@ func generateChangelog(client *github.Client, changelog *Changelog) error {
 			return fmt.Errorf("could not generate changelog: %s", err)
 		}
 	}
-}
-
-func commitFocus(str string) string {
-	// first, some sanitization
-	// parse only the title, strip the commit body
-	str = strings.Split(str, "\n")[0]
-	if !strings.Contains(str, "(") || !strings.Contains(str, ")") {
-		return ""
-	}
-	// fetch the string between the parentheses
-	return strings.TrimSpace(strings.Split(strings.Split(str, ")")[0], "(")[1])
-}
-
-func commitTitle(str string) string {
-	// first, some sanitization
-	// parse only the title, strip the commit body
-	str = strings.Split(str, "\n")[0]
-	// if the commit title doesn't follow our standards, just dump the whole string
-	if !strings.Contains(str, ":") {
-		return str
-	}
-	return strings.TrimSpace(strings.Split(str, ":")[1])
 }
