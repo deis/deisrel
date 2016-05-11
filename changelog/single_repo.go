@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-github/github"
 )
 
+// SingleRepoVals generates a changelog entry from vals.OldRelease to sha. It returns the commits that were unparseable (and had to be skipped) or any error encountered during the process. On a nil error, vals is filled in with all of the sorted changelog entries
 func SingleRepoVals(client *github.Client, vals *Values, sha, name string) ([]string, error) {
 	var skippedCommits []string
 	commitCompare, resp, err := client.Repositories.CompareCommits("deis", name, vals.OldRelease, sha)
