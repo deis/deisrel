@@ -13,7 +13,7 @@ import (
 var version = "0.0.0"
 
 func main() {
-	ghTkn := os.Getenv("GITHUB_TOKEN")
+	ghTkn := os.Getenv("GITHUB_ACCESS_TOKEN")
 	if ghTkn == "" {
 		log.Fatalf("'GITHUB_TOKEN' env var required")
 	}
