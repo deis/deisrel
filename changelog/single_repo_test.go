@@ -3,9 +3,9 @@ package changelog
 import (
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
 
+	"github.com/arschles/assert"
 	"github.com/deis/deisrel/testutil"
 )
 
@@ -75,14 +75,14 @@ func TestGenerateChangelog(t *testing.T) {
 		}`)
 	})
 
-	got := &Changelog{
+	got := &Values{
 		OldRelease: "b",
 		NewRelease: "h",
 	}
 
-	if err := SingleRepoVals(ts.Client, got); err != nil {
-		t.Errorf("generateChangelog returned an error: %s", err)
-	}
+	skipped, err := SingleRepoVals(ts.Client, got, "sha", "repo")
+	assert.NoErr(t, err)
+	assert.Equal(t, len(skipped), 0, "number of skipped commits")
 
 	want := &Values{
 		OldRelease:    "b",
@@ -93,12 +93,10 @@ func TestGenerateChangelog(t *testing.T) {
 		Maintenance:   []string{"abc5678 deisrel: boring chore"},
 	}
 
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("generateChangelog returned \n%+v, want \n%+v", got, want)
-	}
+	assert.Equal(t, got, want, "returned changelog values")
 }
 
-func TestGenerateChangelog_NoRelevantCommits(t *testing.T) {
+func TestGenerateChangelogWithNoRelevantCommits(t *testing.T) {
 	ts := testutil.NewTestServer()
 	defer ts.Close()
 
@@ -136,21 +134,19 @@ func TestGenerateChangelog_NoRelevantCommits(t *testing.T) {
 		}`)
 	})
 
-	got := &Changelog{
+	got := &Values{
 		OldRelease: "b",
 		NewRelease: "h",
 	}
 
-	if err := generateChangelog(ts.Client, got); err != nil {
-		t.Errorf("generateChangelog returned an error: %s", err)
-	}
+	skipped, err := SingleRepoVals(ts.Client, got, "sha", "repo")
+	assert.NoErr(t, err)
+	assert.Equal(t, len(skipped), 0, "number of skipped commits")
 
-	want := &Changelog{
+	want := &Values{
 		OldRelease: "b",
 		NewRelease: "h",
 	}
 
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("generateChangelog returned \n%+v, want \n%+v", got, want)
-	}
+	assert.Equal(t, got, want, "returned values struct")
 }
