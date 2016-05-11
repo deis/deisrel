@@ -90,7 +90,7 @@ func generateChangelog(client *github.Client, changelog *Changelog) error {
 			}
 			for _, commit := range commitCompare.Commits {
 				commitMessage := strings.Split(*commit.Commit.Message, "\n")[0]
-				changelogMessage := fmt.Sprintf("%s %s: %s", shortShaTransform(*commit.SHA), commitFocus(*commit.Commit.Message), commitTitle(*commit.Commit.Message))
+				changelogMessage := fmt.Sprintf("%s (%s) - %s: %s", shortShaTransform(*commit.SHA), name, commitFocus(*commit.Commit.Message), commitTitle(*commit.Commit.Message))
 				if strings.HasPrefix(commitMessage, "feat(") {
 					changelog.Features = append(changelog.Features, changelogMessage)
 				} else if strings.HasPrefix(commitMessage, "fix(") {
