@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"strings"
 	"testing"
+
+	"github.com/arschles/assert"
 )
 
 const (
@@ -94,4 +96,16 @@ func TestTemplate(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestMergeValues(t *testing.T) {
+	val1 := Values{Features: []string{"feat1"}}
+	val2 := Values{Fixes: []string{"fix1"}, Features: []string{"feat2"}}
+	res := MergeValues("old", "new", []Values{val1, val2})
+	assert.Equal(t, res.OldRelease, "old", "old release")
+	assert.Equal(t, res.NewRelease, "new", "new release")
+	assert.Equal(t, len(res.Features), 2, "length of features slice")
+	assert.Equal(t, len(res.Fixes), 1, "length of fixes slice")
+	assert.Equal(t, res.Features, []string{"feat1", "feat2"}, "features slice")
+	assert.Equal(t, res.Fixes, []string{"fix1"}, "fixes slice")
 }
