@@ -87,10 +87,10 @@ func TestGenerateChangelog(t *testing.T) {
 	want := &Changelog{
 		OldRelease:    "b",
 		NewRelease:    "h",
-		Features:      []string{"abc1234 deisrel: new feature!"},
-		Fixes:         []string{"abc2345 deisrel: bugfix!"},
-		Documentation: []string{"abc3456 deisrel: new docs!", "abc4567 deisrel: new docs!"},
-		Maintenance:   []string{"abc5678 deisrel: boring chore"},
+		Features:      []string{"abc1234 (controller) - deisrel: new feature!"},
+		Fixes:         []string{"abc2345 (controller) - deisrel: bugfix!"},
+		Documentation: []string{"abc3456 (controller) - deisrel: new docs!", "abc4567 (controller) - deisrel: new docs!"},
+		Maintenance:   []string{"abc5678 (controller) - deisrel: boring chore"},
 	}
 
 	if !reflect.DeepEqual(got, want) {
