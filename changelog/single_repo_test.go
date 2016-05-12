@@ -80,7 +80,7 @@ func TestGenerateChangelog(t *testing.T) {
 		NewRelease: "h",
 	}
 
-	skipped, err := SingleRepoVals(ts.Client, got, "h", "controller")
+	skipped, err := SingleRepoVals(ts.Client, got, "h", "controller", false)
 	assert.NoErr(t, err)
 	assert.Equal(t, len(skipped), 0, "number of skipped commits")
 
@@ -139,7 +139,7 @@ func TestGenerateChangelogWithNoRelevantCommits(t *testing.T) {
 		NewRelease: "h",
 	}
 
-	skipped, err := SingleRepoVals(ts.Client, got, "h", "controller")
+	skipped, err := SingleRepoVals(ts.Client, got, "h", "controller", false)
 	assert.NoErr(t, err)
 	assert.Equal(t, len(skipped), 0, "number of skipped commits")
 
