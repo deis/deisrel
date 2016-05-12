@@ -20,7 +20,7 @@ func GenerateIndividualChangelog(client *github.Client, dest io.Writer) func(*cl
 			OldRelease: c.Args().Get(1),
 			NewRelease: c.Args().Get(3),
 		}
-		if vals.OldRelease == "" || vals.NewRelease == "" || sha == "" {
+		if vals.OldRelease == "" || vals.NewRelease == "" || sha == "" || repoName == "" {
 			log.Fatal("Usage: changelog individual <repo> <old-release> <sha> <new-release>")
 		}
 		skippedCommits, err := changelog.SingleRepoVals(client, vals, sha, repoName)
