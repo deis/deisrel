@@ -80,7 +80,7 @@ func TestGenerateChangelog(t *testing.T) {
 		NewRelease: "h",
 	}
 
-	skipped, err := SingleRepoVals(ts.Client, got, "sha", "repo")
+	skipped, err := SingleRepoVals(ts.Client, got, "h", "controller")
 	assert.NoErr(t, err)
 	assert.Equal(t, len(skipped), 0, "number of skipped commits")
 
