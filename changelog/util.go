@@ -23,5 +23,5 @@ func commitTitle(str string) string {
 	if !strings.Contains(str, ":") {
 		return str
 	}
-	return strings.TrimSpace(strings.Split(str, ":")[1])
+	return strings.TrimSpace(strings.Join(strings.Split(str, ":")[1:], ":"))
 }
