@@ -10,28 +10,25 @@ const (
 {{ if (len .Features) gt 0 }}
 # Features
 
-{{range .Features}} - {{.}}
+{{range .Features}}- {{.}}
 {{end}}
-{{end}}
-
-{{ if (len .Fixes) gt 0 }}
+{{ end -}}
+{{ if (len .Fixes) gt 0 -}}
 # Fixes
 
-{{range .Fixes}} - {{.}}
+{{range .Fixes}}- {{.}}
 {{end}}
-{{end}}
-
+{{ end }}
 {{ if (len .Documentation) gt 0 }}
 # Documentation
 
-{{range .Documentation}} - {{.}}
+{{range .Documentation}}- {{.}}
 {{end}}
 {{end}}
-
 {{ if (len .Maintenance) gt 0 }}
 # Maintenance
 
-{{range .Maintenance}} - {{.}}
+{{range .Maintenance}}- {{.}}
 {{end}}
 {{end}}`
 )
