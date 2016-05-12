@@ -100,7 +100,7 @@ func TestGenerateChangelogWithNoRelevantCommits(t *testing.T) {
 	ts := testutil.NewTestServer()
 	defer ts.Close()
 
-	ts.Mux.HandleFunc("/repos/deis/r/compare/b...h", func(w http.ResponseWriter, r *http.Request) {
+	ts.Mux.HandleFunc("/repos/deis/controller/compare/b...h", func(w http.ResponseWriter, r *http.Request) {
 		if got := r.Method; got != "GET" {
 			t.Errorf("Request method: %v, want GET", got)
 		}
@@ -139,7 +139,7 @@ func TestGenerateChangelogWithNoRelevantCommits(t *testing.T) {
 		NewRelease: "h",
 	}
 
-	skipped, err := SingleRepoVals(ts.Client, got, "sha", "repo")
+	skipped, err := SingleRepoVals(ts.Client, got, "h", "controller")
 	assert.NoErr(t, err)
 	assert.Equal(t, len(skipped), 0, "number of skipped commits")
 

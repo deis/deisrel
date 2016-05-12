@@ -20,13 +20,20 @@ func SingleRepoVals(client *github.Client, vals *Values, sha, name string) ([]st
 		return nil, errCouldNotCompareCommits{old: vals.OldRelease, new: sha, err: err}
 	}
 	for _, commit := range commitCompare.Commits {
+		if commit.Commit.Message == nil {
+			continue
+		}
+		if commit.SHA == nil {
+			continue
+		}
 		commitMessage := strings.Split(*commit.Commit.Message, "\n")[0]
-		changelogMessage := fmt.Sprintf(
-			"%s %s: %s",
-			git.ShortSHATransform(*commit.SHA),
-			commitFocus(*commit.Commit.Message),
-			commitTitle(*commit.Commit.Message),
-		)
+		shortSHA, err := git.ShortSHATransform(*commit.SHA)
+		if err != nil {
+			return nil, err
+		}
+		focus := commitFocus(*commit.Commit.Message)
+		title := commitTitle(*commit.Commit.Message)
+		changelogMessage := fmt.Sprintf("%s %s: %s", shortSHA, focus, title)
 		if strings.HasPrefix(commitMessage, "feat(") {
 			vals.Features = append(vals.Features, changelogMessage)
 		} else if strings.HasPrefix(commitMessage, "fix(") {
