@@ -47,3 +47,15 @@ type Values struct {
 	Documentation []string
 	Maintenance   []string
 }
+
+// MergeValues merges all of the slices in vals together into a single Values struct which has OldRelease set to oldRel and NewRelease set to newRel
+func MergeValues(oldRel, newRel string, vals []Values) *Values {
+	ret := &Values{OldRelease: oldRel, NewRelease: newRel}
+	for _, val := range vals {
+		ret.Features = append(ret.Features, val.Features...)
+		ret.Fixes = append(ret.Fixes, val.Fixes...)
+		ret.Documentation = append(ret.Documentation, val.Documentation...)
+		ret.Maintenance = append(ret.Maintenance, val.Maintenance...)
+	}
+	return ret
+}

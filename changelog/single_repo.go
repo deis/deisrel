@@ -10,7 +10,7 @@ import (
 )
 
 // SingleRepoVals generates a changelog entry from vals.OldRelease to sha. It returns the commits that were unparseable (and had to be skipped) or any error encountered during the process. On a nil error, vals is filled in with all of the sorted changelog entries. Note that any nil commits will not be in the returned string slice
-func SingleRepoVals(client *github.Client, vals *Values, sha, name string) ([]string, error) {
+func SingleRepoVals(client *github.Client, vals *Values, sha, name string, includeRepoName bool) ([]string, error) {
 	var skippedCommits []string
 	commitCompare, resp, err := client.Repositories.CompareCommits("deis", name, vals.OldRelease, sha)
 	if err != nil {
@@ -34,6 +34,9 @@ func SingleRepoVals(client *github.Client, vals *Values, sha, name string) ([]st
 		focus := commitFocus(*commit.Commit.Message)
 		title := commitTitle(*commit.Commit.Message)
 		changelogMessage := fmt.Sprintf("%s %s: %s", shortSHA, focus, title)
+		if includeRepoName {
+			changelogMessage = fmt.Sprintf("%s (%s) - %s: %s", shortSHA, name, focus, title)
+		}
 		if strings.HasPrefix(commitMessage, "feat(") {
 			vals.Features = append(vals.Features, changelogMessage)
 		} else if strings.HasPrefix(commitMessage, "fix(") {

@@ -23,7 +23,7 @@ func GenerateIndividualChangelog(client *github.Client, dest io.Writer) func(*cl
 		if vals.OldRelease == "" || vals.NewRelease == "" || sha == "" || repoName == "" {
 			log.Fatal("Usage: changelog individual <repo> <old-release> <sha> <new-release>")
 		}
-		skippedCommits, err := changelog.SingleRepoVals(client, vals, sha, repoName)
+		skippedCommits, err := changelog.SingleRepoVals(client, vals, sha, repoName, false)
 
 		if len(skippedCommits) > 0 {
 			for _, ci := range skippedCommits {
