@@ -10,12 +10,16 @@ import (
 	"golang.org/x/oauth2"
 )
 
+const (
+	tokenEnvVarName = "GITHUB_ACCESS_TOKEN"
+)
+
 var version = "0.0.0"
 
 func main() {
-	ghTkn := os.Getenv("GITHUB_ACCESS_TOKEN")
+	ghTkn := os.Getenv(tokenEnvVarName)
 	if ghTkn == "" {
-		log.Fatalf("'GITHUB_TOKEN' env var required")
+		log.Fatalf("'%s' env var required", tokenEnvVarName)
 	}
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: ghTkn})
 	cl := oauth2.NewClient(oauth2.NoContext, ts)
