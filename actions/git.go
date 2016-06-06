@@ -13,11 +13,6 @@ import (
 	"github.com/google/go-github/github"
 )
 
-type repoAndSha struct {
-	repoName string
-	sha      string
-}
-
 func noTransform(s string) string       { return s }
 func shortShaTransform(s string) string { return s[:7] }
 
