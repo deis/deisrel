@@ -92,6 +92,7 @@ func downloadContents(ghClient *github.Client, org, repo, filepath string, opt *
 	return rc, nil
 }
 
+// GitTag creates the CLI action for the 'deisrel git tag' command
 func GitTag(client *github.Client) func(c *cli.Context) error {
 	return func(c *cli.Context) error {
 		tag := c.Args().Get(0)
@@ -122,10 +123,14 @@ func GitTag(client *github.Client) func(c *cli.Context) error {
 			}
 		}
 		fmt.Println("=== Repos")
+		rasList := newEmptyRepoAndShaList()
 		for _, repo := range repos {
-			fmt.Printf("%s: %s\n", repo.repoName, repo.sha)
+			rasList.Add(repo)
 		}
-		var ok bool = true
+		rasList.Sort()
+		fmt.Println(rasList.String())
+
+		var ok = true
 		if !c.Bool(YesFlag) {
 			var err error
 			ok, err = prompt()
