@@ -11,7 +11,7 @@ services:
 install:
 - make bootstrap
 script:
-  - make build test
+  - make build-docker test-docker
 before_deploy:
   - make dist prep-bintray-json
 deploy:

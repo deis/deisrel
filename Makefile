@@ -18,14 +18,23 @@ DEV_ENV_CMD := ${DEV_ENV_PREFIX} ${DEV_ENV_IMAGE}
 
 DEIS_BINARY_NAME ?= ./deis
 
+GO_BUILD_CMD := go build -a -installsuffix cgo -ldflags ${LDFLAGS} -o deisrel .
+GO_TEST_CMD := go test -v $$(glide nv)
+
 bootstrap:
 	${DEV_ENV_CMD} glide install
 
 build:
-	${DEV_ENV_PREFIX} -e GOOS=${GOOS} ${DEV_ENV_IMAGE} go build -a -installsuffix cgo -ldflags ${LDFLAGS} -o deisrel .
+	${GO_BUILD_CMD}
+
+build-docker:
+	${DEV_ENV_PREFIX} -e GOOS=${GOOS} ${DEV_ENV_IMAGE} ${GO_BUILD_CMD}
 
 test:
-	${DEV_ENV_CMD} sh -c 'go test -v $$(glide nv)'
+	${GO_TEST_CMD}
+
+test-docker:
+	${DEV_ENV_CMD} sh -c '${GO_TEST_CMD}'
 
 build-cli-cross:
 	${DEV_ENV_CMD} gox -output="bin/${SHORT_NAME}-${VERSION}-{{.OS}}-{{.Arch}}"
