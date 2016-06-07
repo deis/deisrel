@@ -3,94 +3,14 @@ package actions
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"strings"
-	"sync"
 
 	"github.com/codegangsta/cli"
+	"github.com/deis/deisrel/git"
 	"github.com/google/go-github/github"
 )
-
-func noTransform(s string) string       { return s }
-func shortShaTransform(s string) string { return s[:7] }
-
-func getShas(ghClient *github.Client, repos []string, transform func(string) string, ref string) ([]repoAndSha, error) {
-	outCh := make(chan repoAndSha)
-	errCh := make(chan error)
-	doneCh := make(chan struct{})
-	var wg sync.WaitGroup
-	for _, repo := range repos {
-		wg.Add(1)
-		ch := make(chan repoAndSha)
-		ech := make(chan error)
-		go func(repo string) {
-			commitsListOpts := &github.CommitsListOptions{
-				SHA: ref,
-				ListOptions: github.ListOptions{
-					Page:    1,
-					PerPage: 1,
-				},
-			}
-			repoCommits, _, err := ghClient.Repositories.ListCommits("deis", repo, commitsListOpts)
-			if err != nil {
-				ech <- fmt.Errorf("Error listing commits for repo %s (%s)", repo, err)
-				return
-			}
-			if len(repoCommits) < 1 {
-				ech <- fmt.Errorf("No commits found for repo %s", repo)
-				return
-			}
-			repoCommit := repoCommits[0]
-			sha := transform(*repoCommit.SHA)
-			ch <- repoAndSha{repoName: repo, sha: sha}
-		}(repo)
-		go func() {
-			defer wg.Done()
-			select {
-			case e := <-ech:
-				errCh <- e
-			case o := <-ch:
-				outCh <- o
-			}
-		}()
-	}
-	go func() {
-		wg.Wait()
-		close(doneCh)
-	}()
-
-	ret := []repoAndSha{}
-	for {
-		select {
-		case <-doneCh:
-			return ret, nil
-		case str := <-outCh:
-			ret = append(ret, str)
-		case err := <-errCh:
-			return nil, err
-		}
-	}
-}
-
-func getLastTag(ghClient *github.Client, repos []string) (map[string]*github.RepositoryTag, error) {
-	for _, repo := range repos {
-		_, _, err := ghClient.Repositories.ListTags("deis", repo, nil)
-		if err != nil {
-			return make(map[string]*github.RepositoryTag), err
-		}
-	}
-	return make(map[string]*github.RepositoryTag), nil
-}
-
-func downloadContents(ghClient *github.Client, org, repo, filepath string, opt *github.RepositoryContentGetOptions) (io.ReadCloser, error) {
-	rc, err := ghClient.Repositories.DownloadContents(org, repo, filepath, opt)
-	if err != nil {
-		return nil, err
-	}
-	return rc, nil
-}
 
 // GitTag creates the CLI action for the 'deisrel git tag' command
 func GitTag(client *github.Client) func(c *cli.Context) error {
@@ -102,7 +22,7 @@ func GitTag(client *github.Client) func(c *cli.Context) error {
 			log.Fatal("Usage: deisrel git tag <options> <tag>")
 		}
 
-		repos, err := getShas(client, allGitRepoNames, noTransform, c.String(RefFlag))
+		repos, err := git.GetSHAs(client, allGitRepoNames, git.NoTransform, c.String(RefFlag))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -116,21 +36,21 @@ func GitTag(client *github.Client) func(c *cli.Context) error {
 			// specify a subset of the latest repos
 			for _, repo := range repos {
 				for _, updatedRepo := range reposFromFile {
-					if updatedRepo.repoName == repo.repoName {
-						repo.sha = updatedRepo.sha
+					if updatedRepo.Name == repo.Name {
+						repo.SHA = updatedRepo.SHA
 					}
 				}
 			}
 		}
 		fmt.Println("=== Repos")
-		rasList := newEmptyRepoAndShaList()
+		rasList := git.NewEmptyRepoAndShaList()
 		for _, repo := range repos {
 			rasList.Add(repo)
 		}
 		rasList.Sort()
 		fmt.Println(rasList.String())
 
-		var ok = true
+		ok := true
 		if !c.Bool(YesFlag) {
 			var err error
 			ok, err = prompt()
@@ -140,7 +60,7 @@ func GitTag(client *github.Client) func(c *cli.Context) error {
 		}
 
 		if ok {
-			if err := createGitTag(client, repos, tag); err != nil {
+			if err := git.CreateTags(client, repos, tag); err != nil {
 				log.Fatal(fmt.Errorf("could create tag %s: %v", tag, err))
 			}
 		}
@@ -180,8 +100,8 @@ func prompt() (bool, error) {
 	return false, nil
 }
 
-func getShasFromFilepath(path string) ([]repoAndSha, error) {
-	ret := []repoAndSha{}
+func getShasFromFilepath(path string) ([]git.RepoAndSha, error) {
+	ret := []git.RepoAndSha{}
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("could not open %s: %s", path, err)
@@ -193,9 +113,9 @@ func getShasFromFilepath(path string) ([]repoAndSha, error) {
 		line := scanner.Text()
 		if strings.ContainsRune(line, '=') {
 			repoParts := strings.SplitN(line, "=", 2)
-			ret = append(ret, repoAndSha{
-				repoName: repoParts[0],
-				sha:      repoParts[1],
+			ret = append(ret, git.RepoAndSha{
+				Name: repoParts[0],
+				SHA:  repoParts[1],
 			})
 		}
 	}
@@ -203,25 +123,4 @@ func getShasFromFilepath(path string) ([]repoAndSha, error) {
 		return nil, fmt.Errorf("failed reading %s: %s", path, err)
 	}
 	return ret, nil
-}
-
-// createGitTag tags each repository at the given SHA with the tag supplied.
-func createGitTag(client *github.Client, repos []repoAndSha, tag string) error {
-	for _, repo := range repos {
-		ref := &github.Reference{
-			Ref: github.String("refs/tags/" + tag),
-			Object: &github.GitObject{
-				SHA: github.String(repo.sha),
-			},
-		}
-		_, _, err := client.Git.CreateRef("deis", repo.repoName, ref)
-		// GitHub returns HTTP 422 Unprocessable Entity when a field is invalid,
-		// such as when a reference already exists or the sha does not exist
-		// https://developer.github.com/v3/#client-errors
-		if err != nil && !strings.Contains(err.Error(), "Reference already exists") {
-			return err
-		}
-		fmt.Printf("%s: created tag %s\n", repo.repoName, tag)
-	}
-	return nil
 }

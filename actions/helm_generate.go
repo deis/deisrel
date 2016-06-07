@@ -8,6 +8,7 @@ import (
 	"text/template"
 
 	"github.com/arschles/sys"
+	"github.com/deis/deisrel/git"
 	"github.com/google/go-github/github"
 )
 
@@ -53,7 +54,7 @@ func getParamsComponentMap(ghClient *github.Client, defaultParamsComponentAttrs 
 
 	if defaultParamsComponentAttrs.Tag == "" {
 		// gather latest sha for each repo via GitHub api
-		reposAndShas, err := getShas(ghClient, repoNames, shortShaTransform, ref)
+		reposAndShas, err := git.GetSHAs(ghClient, repoNames, git.ShortSHATransformNoErr, ref)
 		if err != nil {
 			log.Fatalf("No tag given and couldn't fetch sha from GitHub (%s)", err)
 		} else if len(reposAndShas) < 1 {
@@ -62,10 +63,10 @@ func getParamsComponentMap(ghClient *github.Client, defaultParamsComponentAttrs 
 
 		// a given repo may track multiple components; update each component Tag accordingly
 		for _, repoAndSha := range reposAndShas {
-			repoComponentNames := repoToComponentNames[repoAndSha.repoName]
+			repoComponentNames := repoToComponentNames[repoAndSha.Name]
 			paramsComponentAttrs := defaultParamsComponentAttrs
 			for _, componentName := range repoComponentNames {
-				paramsComponentAttrs.Tag = "git-" + repoAndSha.sha
+				paramsComponentAttrs.Tag = "git-" + repoAndSha.SHA
 				paramsComponentMap[componentName] = paramsComponentAttrs
 			}
 		}

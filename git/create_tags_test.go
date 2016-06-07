@@ -1,4 +1,4 @@
-package actions
+package git
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 )
 
 // TestCreateGitTag tests that creating a tag should be ok
-func TestCreateGitTag(t *testing.T) {
+func TestCreateTags(t *testing.T) {
 	ts := testutil.NewTestServer()
 	defer ts.Close()
 
@@ -37,14 +37,14 @@ func TestCreateGitTag(t *testing.T) {
 		}
 	})
 
-	repos := []repoAndSha{
+	repos := []RepoAndSha{
 		{
-			repoName: "controller",
-			sha:      "aa218f56b14c9653891f9e74264a383fa43fefbd",
+			Name: "controller",
+			SHA:  "aa218f56b14c9653891f9e74264a383fa43fefbd",
 		},
 	}
 
-	if err := createGitTag(ts.Client, repos, "b"); err != nil {
+	if err := CreateTags(ts.Client, repos, "b"); err != nil {
 		t.Errorf("createGitTag returned error: %v", err)
 	}
 
@@ -86,14 +86,14 @@ func TestCreateGitTagAlreadyExists(t *testing.T) {
 		}`)
 	})
 
-	repos := []repoAndSha{
+	repos := []RepoAndSha{
 		{
-			repoName: "controller",
-			sha:      "aa218f56b14c9653891f9e74264a383fa43fefbd",
+			Name: "controller",
+			SHA:  "aa218f56b14c9653891f9e74264a383fa43fefbd",
 		},
 	}
 
-	if err := createGitTag(ts.Client, repos, "b"); err != nil {
+	if err := CreateTags(ts.Client, repos, "b"); err != nil {
 		t.Errorf("createGitTag returned error: %v", err)
 	}
 }
@@ -114,14 +114,14 @@ func TestCreateGitTagBadSHA(t *testing.T) {
 		}`)
 	})
 
-	repos := []repoAndSha{
+	repos := []RepoAndSha{
 		{
-			repoName: "controller",
-			sha:      "aa218f56b14c9653891f9e74264a383fa43fefbd",
+			Name: "controller",
+			SHA:  "aa218f56b14c9653891f9e74264a383fa43fefbd",
 		},
 	}
 
-	if err := createGitTag(ts.Client, repos, "b"); err == nil {
+	if err := CreateTags(ts.Client, repos, "b"); err == nil {
 		t.Error("createGitTag didn't return an error when the API says it's an invalid SHA")
 	}
 }

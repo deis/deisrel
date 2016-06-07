@@ -10,6 +10,7 @@ import (
 
 	"github.com/arschles/assert"
 	"github.com/arschles/sys"
+	"github.com/deis/deisrel/git"
 	"github.com/deis/deisrel/testutil"
 )
 
@@ -109,7 +110,7 @@ func TestGenParamsComponentMapWorkflowE2EEmptyTag(t *testing.T) {
 		fmt.Fprintf(w, resp)
 	})
 
-	testGenParamsComponentMap(t, ts, "", fmt.Sprintf("git-%s", shortShaTransform(sha)), ref, WorkflowE2EChart)
+	testGenParamsComponentMap(t, ts, "", fmt.Sprintf("git-%s", git.ShortSHATransformNoErr(sha)), ref, WorkflowE2EChart)
 }
 
 func TestGenParamsComponentMapWorkflow(t *testing.T) {

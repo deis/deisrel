@@ -11,6 +11,7 @@ import (
 
 	"github.com/arschles/assert"
 	"github.com/arschles/sys"
+	"github.com/deis/deisrel/git"
 	"github.com/deis/deisrel/testutil"
 	"github.com/google/go-github/github"
 )
@@ -72,7 +73,7 @@ func TestDownloadFiles(t *testing.T) {
 
 	assert.NoErr(t, err)
 	assert.Equal(t, len(got), 1, "length of downloaded file slice")
-	assert.Equal(t, got[0].FileName, helmChart.Files[0], "file name")
+	assert.Equal(t, got[0].Name, helmChart.Files[0], "file name")
 }
 
 func TestDownloadFilesNotExist(t *testing.T) {
@@ -121,11 +122,11 @@ func TestStageFiles(t *testing.T) {
 
 	readCloser := ioutil.NopCloser(bytes.NewBufferString(""))
 	fileName := "testFile"
-	ghFileToStage := ghFile{ReadCloser: readCloser, FileName: fileName}
+	ghFileToStage := git.File{ReadCloser: readCloser, Name: fileName}
 	stagingDir := "staging"
 
 	fakeFS.MkdirAll(stagingDir, os.ModePerm)
-	stageFiles(fakeFS, []ghFile{ghFileToStage}, stagingDir)
+	stageFiles(fakeFS, []git.File{ghFileToStage}, stagingDir)
 
 	_, err := fakeFS.ReadFile(filepath.Join(stagingDir, fileName))
 	assert.NoErr(t, err)

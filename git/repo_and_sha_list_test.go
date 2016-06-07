@@ -1,4 +1,4 @@
-package actions
+package git
 
 import (
 	"strings"
@@ -8,35 +8,35 @@ import (
 )
 
 var (
-	ras1 = repoAndSha{repoName: "testRepo1", sha: "testSHA"}
-	ras2 = repoAndSha{repoName: "testRepo2", sha: "testSHA"}
+	ras1 = RepoAndSha{Name: "testRepo1", SHA: "testSHA"}
+	ras2 = RepoAndSha{Name: "testRepo2", SHA: "testSHA"}
 )
 
 func TestNewEmptyRepoAndShaList(t *testing.T) {
-	empty := newEmptyRepoAndShaList()
+	empty := NewEmptyRepoAndShaList()
 	assert.NotNil(t, empty.repoAndShaMap, "repo and sha map")
 }
 
 func TestRepoAndShaListAdd(t *testing.T) {
-	rasl := newEmptyRepoAndShaList()
+	rasl := NewEmptyRepoAndShaList()
 	rasl.Add(ras1)
 	assert.Equal(t, len(rasl.repoNames), 1, "length of repo names list")
-	assert.Equal(t, rasl.repoNames[0], ras1.repoName, "repo name in list")
-	assert.Equal(t, rasl.repoAndShaMap[ras1.repoName].sha, ras1.sha, "repo sha in map")
+	assert.Equal(t, rasl.repoNames[0], ras1.Name, "repo name in list")
+	assert.Equal(t, rasl.repoAndShaMap[ras1.Name].SHA, ras1.SHA, "repo sha in map")
 }
 
 func TestRepoAndShaListSort(t *testing.T) {
-	rasl := newEmptyRepoAndShaList()
+	rasl := NewEmptyRepoAndShaList()
 	rasl.Add(ras1)
 	rasl.Add(ras2)
 	rasl.Sort()
 	assert.Equal(t, len(rasl.repoNames), 2, "length of repo names list")
-	assert.Equal(t, rasl.repoNames[0], ras1.repoName, "name of first repo")
-	assert.Equal(t, rasl.repoNames[1], ras2.repoName, "name of second repo")
+	assert.Equal(t, rasl.repoNames[0], ras1.Name, "name of first repo")
+	assert.Equal(t, rasl.repoNames[1], ras2.Name, "name of second repo")
 }
 
 func TestRepoAndShaListString(t *testing.T) {
-	rasl := newEmptyRepoAndShaList()
+	rasl := NewEmptyRepoAndShaList()
 	rasl.Add(ras1)
 	rasl.Add(ras2)
 	str := rasl.String()

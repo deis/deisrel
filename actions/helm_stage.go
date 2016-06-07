@@ -8,13 +8,9 @@ import (
 
 	"github.com/arschles/sys"
 	"github.com/codegangsta/cli"
+	"github.com/deis/deisrel/git"
 	"github.com/google/go-github/github"
 )
-
-type ghFile struct {
-	ReadCloser io.ReadCloser
-	FileName   string
-}
 
 var (
 	ourFS = sys.RealFS()
@@ -69,24 +65,30 @@ func createDir(fs sys.FS, dirName string) error {
 	return nil
 }
 
-func downloadFiles(ghClient *github.Client, org, repo string, opt *github.RepositoryContentGetOptions, helmChart helmChart) ([]ghFile, error) {
-	ret := make([]ghFile, 0, len(helmChart.Files))
+func downloadFiles(
+	ghClient *github.Client,
+	org,
+	repo string,
+	opt *github.RepositoryContentGetOptions,
+	helmChart helmChart) ([]git.File, error) {
+
+	ret := make([]git.File, 0, len(helmChart.Files))
 	for _, fileName := range helmChart.Files {
 		relativeFilePath := filepath.Join(helmChart.Name, fileName)
-		readCloser, err := downloadContents(ghClient, org, repo, relativeFilePath, opt)
+		readCloser, err := git.DownloadContents(ghClient, org, repo, relativeFilePath, opt)
 		if err != nil {
 			return nil, err
 		}
-		ret = append(ret, ghFile{ReadCloser: readCloser, FileName: fileName})
+		ret = append(ret, git.File{ReadCloser: readCloser, Name: fileName})
 	}
 	return ret, nil
 }
 
-func stageFiles(fs sys.FS, ghFiles []ghFile, stagingDir string) {
+func stageFiles(fs sys.FS, ghFiles []git.File, stagingDir string) {
 	for _, ghFile := range ghFiles {
 		readCloser := ghFile.ReadCloser
 
-		localFilePath := filepath.Join(stagingDir, ghFile.FileName)
+		localFilePath := filepath.Join(stagingDir, ghFile.Name)
 		f, err := fs.Create(localFilePath)
 		if err != nil {
 			log.Fatalf("Error creating file %s (%s)", localFilePath, err)
@@ -95,7 +97,7 @@ func stageFiles(fs sys.FS, ghFiles []ghFile, stagingDir string) {
 		if _, err := io.Copy(f, readCloser); err != nil {
 			log.Fatalf("Error writing contents to file %s (%s)", localFilePath, err)
 		}
-		log.Printf("File %s staged in '%s'", ghFile.FileName, stagingDir)
+		log.Printf("File %s staged in '%s'", ghFile.Name, stagingDir)
 		defer readCloser.Close()
 		defer f.Close()
 	}
