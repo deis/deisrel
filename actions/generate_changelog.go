@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"sync"
@@ -21,7 +22,7 @@ func GenerateChangelog(client *github.Client, dest io.Writer) func(*cli.Context)
 		vals, errs := generateChangelogVals(client, oldTag, newTag)
 		if len(errs) > 0 {
 			for _, err := range errs {
-				log.Printf("Error: %s", err)
+				fmt.Printf("Error: %s\n", err)
 			}
 		}
 		if err := changelog.Tpl.Execute(dest, changelog.MergeValues(oldTag, newTag, vals)); err != nil {

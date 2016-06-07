@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -45,6 +46,6 @@ func (r *releaseWalker) walk(path string, release releaseName, fi os.FileInfo, e
 		log.Fatalf("Error writing contents to file %s (%s)", path, err)
 	}
 
-	log.Printf("File '%s' updated with release '%s'", path, release.Short)
+	fmt.Printf("File '%s' updated with release '%s'\n", path, release.Short)
 	return nil
 }

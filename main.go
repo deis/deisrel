@@ -31,6 +31,22 @@ func main() {
 	app.Version = version
 	app.Commands = []cli.Command{
 		cli.Command{
+			Name: "docker",
+			Subcommands: []cli.Command{
+				cli.Command{
+					Name:   "check-tags",
+					Action: actions.DockerCheckTags(ghClient),
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name:  actions.RefFlag,
+							Value: "master",
+							Usage: "Optional ref to add to GitHub repo request (can be SHA, branch or tag)",
+						},
+					},
+				},
+			},
+		},
+		cli.Command{
 			Name: "git",
 			Subcommands: []cli.Command{
 				cli.Command{

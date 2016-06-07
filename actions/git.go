@@ -13,6 +13,7 @@ import (
 	"github.com/google/go-github/github"
 )
 
+// TODO: breakup and move to 'git' package https://github.com/deis/deisrel/issues/60
 type repoAndSha struct {
 	repoName string
 	sha      string
@@ -20,6 +21,7 @@ type repoAndSha struct {
 
 func noTransform(s string) string       { return s }
 func shortShaTransform(s string) string { return s[:7] }
+func imageTagTransform(s string) string { return fmt.Sprintf("git-%s", shortShaTransform(s)) }
 
 func getShas(ghClient *github.Client, repos []string, transform func(string) string, ref string) ([]repoAndSha, error) {
 	outCh := make(chan repoAndSha)

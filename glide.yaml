@@ -7,3 +7,12 @@ import:
 - package: golang.org/x/oauth2
 - package: github.com/arschles/sys
 - package: github.com/arschles/assert
+- package: github.com/coreos/go-quay
+  subpackages:
+  - quay
+- package: github.com/go-swagger/go-swagger
+  subpackages:
+  - cmd/swagger
+- package: github.com/heroku/docker-registry-client
+  subpackages:
+  - registry

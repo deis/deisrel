@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -95,7 +96,7 @@ func stageFiles(fs sys.FS, ghFiles []ghFile, stagingDir string) {
 		if _, err := io.Copy(f, readCloser); err != nil {
 			log.Fatalf("Error writing contents to file %s (%s)", localFilePath, err)
 		}
-		log.Printf("File %s staged in '%s'", ghFile.FileName, stagingDir)
+		fmt.Printf("File %s staged in '%s'\n", ghFile.FileName, stagingDir)
 		defer readCloser.Close()
 		defer f.Close()
 	}
@@ -103,7 +104,7 @@ func stageFiles(fs sys.FS, ghFiles []ghFile, stagingDir string) {
 
 func updateFilesWithRelease(fp sys.FP, fs sys.FS, release releaseName, walkPath string) error {
 	if release.Full == "" || release.Short == "" {
-		log.Printf("WORKFLOW_RELEASE (%s) and/or WORKFLOW_RELEASE_SHORT (%s) not provided so not amending staged files.", release.Full, release.Short)
+		fmt.Printf("WORKFLOW_RELEASE (%s) and/or WORKFLOW_RELEASE_SHORT (%s) not provided so not amending staged files.\n", release.Full, release.Short)
 	} else {
 		if err := fp.Walk(walkPath, getReleaseWalker().handlerFunc(fs, release)); err != nil {
 			return err

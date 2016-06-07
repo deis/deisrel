@@ -13,6 +13,7 @@ type TestServer struct {
 	Server *httptest.Server
 	Client *github.Client
 	Mux    *http.ServeMux
+	Host   string
 }
 
 // NewTestServer sets up a test HTTP server along with a github.Client that is
@@ -33,6 +34,7 @@ func NewTestServer() *TestServer {
 		Server: server,
 		Client: client,
 		Mux:    mux,
+		Host:   url.Host,
 	}
 }
 
