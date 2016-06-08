@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.org/deis/deisrel.svg?branch=master)](https://travis-ci.org/deis/deisrel)
 [![codebeat badge](https://codebeat.co/badges/46e06b60-7e4c-4daf-875b-c7c07ee56035)](https://codebeat.co/projects/github-com-deis-deisrel)
-[![Download](https://api.bintray.com/packages/deis/deisci/deisrel/images/download.svg) ](https://bintray.com/deis/deisci/deisrel/_latestVersion)
+[linux-amd64 Download](https://storage.googleapis.com/deisrel/deisrel-latest-linux-amd64)
+[darwin-amd64 Download](https://storage.googleapis.com/deisrel/deisrel-latest-darwin-amd64)
 
 Deis (pronounced DAY-iss) Workflow is an open source Platform as a Service (PaaS) that adds a
 developer-friendly layer to any [Kubernetes](http://kubernetes.io) cluster, making it easy to
@@ -23,7 +24,8 @@ able to automate the release process through a Continuous Integration server lik
 
 You can install `deisrel` by installing the latest release from [bintray](https://bintray.com/):
 
-[![Download](https://api.bintray.com/packages/deis/deisci/deisrel/images/download.svg) ](https://bintray.com/deis/deisci/deisrel/_latestVersion)
+[linux-amd64](https://storage.googleapis.com/deisrel/deisrel-latest-linux-amd64)
+[darwin-amd64](https://storage.googleapis.com/deisrel/deisrel-latest-darwin-amd64)
 
 Alternatively, you can compile this project from source using Go 1.6+:
 
