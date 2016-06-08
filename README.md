@@ -24,7 +24,7 @@ able to automate the release process through a Continuous Integration server lik
 
 # Installing deisrel
 
-You can install `deisrel` by installing the latest release:
+You can install the latest version of `deisrel` from the following links:
 
 - [linux-amd64](https://storage.googleapis.com/deisrel/deisrel-latest-linux-amd64)
 - [darwin-amd64](https://storage.googleapis.com/deisrel/deisrel-latest-darwin-amd64)
