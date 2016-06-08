@@ -29,5 +29,6 @@ test:
 
 build-cli-cross:
 	${DEV_ENV_CMD} gox -output="bin/${SHORT_NAME}-${VERSION}-{{.OS}}-{{.Arch}}"
+	${DEV_ENV_CMD} gox -output="bin/${SHORT_NAME}-latest-{{.OS}}-{{.Arch}}"
 
 dist: build-cli-cross
