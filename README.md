@@ -24,10 +24,10 @@ able to automate the release process through a Continuous Integration server lik
 
 # Installing deisrel
 
-You can install `deisrel` by installing the latest release from [bintray](https://bintray.com/):
+You can install `deisrel` by installing the latest release:
 
-[linux-amd64](https://storage.googleapis.com/deisrel/deisrel-latest-linux-amd64)
-[darwin-amd64](https://storage.googleapis.com/deisrel/deisrel-latest-darwin-amd64)
+- [linux-amd64](https://storage.googleapis.com/deisrel/deisrel-latest-linux-amd64)
+- [darwin-amd64](https://storage.googleapis.com/deisrel/deisrel-latest-darwin-amd64)
 
 Alternatively, you can compile this project from source using Go 1.6+:
 
