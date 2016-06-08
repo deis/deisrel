@@ -3,9 +3,9 @@ package git
 import (
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
 
+	"github.com/arschles/assert"
 	"github.com/deis/deisrel/testutil"
 	"github.com/google/go-github/github"
 )
@@ -65,9 +65,12 @@ func TestCreateTags(t *testing.T) {
 		},
 	}
 
-	if !reflect.DeepEqual(refs, want) {
-		t.Errorf("createGitTag returned %+v, want %+v", refs, want)
-	}
+	assert.Equal(t, len(refs), len(want), "number of refs returned")
+	assert.Equal(t, refs[0].Ref, want[0].Ref, "ref")
+	assert.Equal(t, refs[0].URL, want[0].URL, "url")
+	assert.Equal(t, *refs[0].Object.Type, *want[0].Object.Type, "object type")
+	assert.Equal(t, *refs[0].Object.SHA, *want[0].Object.SHA, "object SHA")
+	assert.Equal(t, *refs[0].Object.URL, *want[0].Object.URL, "object URL")
 }
 
 // TestCreateGitTagAlreadyExists tests that creating a tag that already exists should be fine

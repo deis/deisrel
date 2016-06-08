@@ -28,7 +28,7 @@ func GitTag(client *github.Client) func(c *cli.Context) error {
 		}
 		if shaFilepath != "" {
 			// update the latest shas with the shas in shaFilepath
-			reposFromFile, err := getShasFromFilepath(shaFilepath)
+			reposFromFile, err := git.GetShasFromFilepath(shaFilepath)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -98,29 +98,4 @@ func prompt() (bool, error) {
 		}
 	}
 	return false, nil
-}
-
-func getShasFromFilepath(path string) ([]git.RepoAndSha, error) {
-	ret := []git.RepoAndSha{}
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, fmt.Errorf("could not open %s: %s", path, err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.ContainsRune(line, '=') {
-			repoParts := strings.SplitN(line, "=", 2)
-			ret = append(ret, git.RepoAndSha{
-				Name: repoParts[0],
-				SHA:  repoParts[1],
-			})
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("failed reading %s: %s", path, err)
-	}
-	return ret, nil
 }

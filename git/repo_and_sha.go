@@ -10,6 +10,14 @@ type RepoAndSha struct {
 	SHA  string
 }
 
+// ShortSHA returns the shortened SHA of r. If the SHA is already short, then returns just r.SHA
+func (r RepoAndSha) ShortSHA() string {
+	if len(r.SHA) < 8 {
+		return r.SHA
+	}
+	return r.SHA[0:7]
+}
+
 // String is the fmt.Stringer interface implementation
 func (r RepoAndSha) String() string {
 	return fmt.Sprintf("%s: %s", r.Name, r.SHA)

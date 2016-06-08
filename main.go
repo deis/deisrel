@@ -6,6 +6,8 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/deis/deisrel/actions"
+	"github.com/deis/deisrel/actions/docker"
+	dlib "github.com/deis/deisrel/docker"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
@@ -24,12 +26,14 @@ func main() {
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: ghTkn})
 	cl := oauth2.NewClient(oauth2.NoContext, ts)
 	ghClient := github.NewClient(cl)
+	dockerCl := dlib.NewCmdClient()
 
 	app := cli.NewApp()
 	app.Name = "deisrel"
 	app.Usage = "Utilities for releasing a new Deis version"
 	app.Version = version
 	app.Commands = []cli.Command{
+		docker.Command(ghClient, dockerCl),
 		cli.Command{
 			Name: "git",
 			Subcommands: []cli.Command{

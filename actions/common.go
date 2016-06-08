@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"text/template"
+
+	"github.com/deis/deisrel/git"
 )
 
 const (
@@ -46,35 +48,18 @@ type releaseName struct {
 }
 
 var (
-	// TODO: https://github.com/deis/deisrel/issues/12
-	repoToComponentNames = map[string][]string{
-		"builder":          {"Builder"},
-		"controller":       {"Controller"},
-		"dockerbuilder":    {"DockerBuilder"},
-		"fluentd":          {"FluentD"},
-		"monitor":          {"InfluxDB", "Grafana", "Telegraf"},
-		"logger":           {"Logger"},
-		"minio":            {"Minio"},
-		"postgres":         {"Database"},
-		"registry":         {"Registry"},
-		"router":           {"Router"},
-		"slugbuilder":      {"SlugBuilder"},
-		"slugrunner":       {"SlugRunner"},
-		"workflow-e2e":     {"WorkflowE2E"},
-		"workflow-manager": {"WorkflowManager"},
-	}
-
-	repoNames = getRepoNames(repoToComponentNames)
-
 	// additionalGitRepoNames represents the repo names lacking representation
 	// in any helm chart, yet still requiring updates during each Workflow
 	// release, including changelog generation and creation of git tags.
 	additionalGitRepoNames = []string{"workflow", "charts"}
 
 	// allGitRepoNames represent all GitHub repo names needing git-based updates for a release
-	allGitRepoNames = append(repoNames, additionalGitRepoNames...)
+	allGitRepoNames = append(git.RepoNames(), additionalGitRepoNames...)
 
-	componentNames = getComponentNames(repoToComponentNames)
+	repoNames      = git.RepoNames()
+	componentNames = git.ComponentNames()
+	// TODO: https://github.com/deis/deisrel/issues/12
+	repoToComponentNames = git.RepoToComponentNames()
 
 	deisRelease = releaseName{
 		Full:  os.Getenv("WORKFLOW_RELEASE"),
@@ -116,24 +101,6 @@ var (
 		},
 	}
 )
-
-func getRepoNames(repoToComponentNames map[string][]string) []string {
-	repoNames := make([]string, 0, len(repoToComponentNames))
-	for repoName := range repoToComponentNames {
-		repoNames = append(repoNames, repoName)
-	}
-	return repoNames
-}
-
-func getComponentNames(repoToComponentNames map[string][]string) []string {
-	var ret []string
-	for _, componentNames := range repoToComponentNames {
-		for _, componentName := range componentNames {
-			ret = append(ret, componentName)
-		}
-	}
-	return ret
-}
 
 func getFullPath(dirName string) string {
 	currentWorkingDir, err := os.Getwd()
