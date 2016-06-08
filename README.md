@@ -2,8 +2,10 @@
 
 [![Build Status](https://travis-ci.org/deis/deisrel.svg?branch=master)](https://travis-ci.org/deis/deisrel)
 [![codebeat badge](https://codebeat.co/badges/46e06b60-7e4c-4daf-875b-c7c07ee56035)](https://codebeat.co/projects/github-com-deis-deisrel)
-[linux-amd64 Download](https://storage.googleapis.com/deisrel/deisrel-latest-linux-amd64)
-[darwin-amd64 Download](https://storage.googleapis.com/deisrel/deisrel-latest-darwin-amd64)
+
+[Download for 64 Bit Linux](https://storage.googleapis.com/deisrel/deisrel-latest-linux-amd64)
+
+[Download for 64 Bit Darwin](https://storage.googleapis.com/deisrel/deisrel-latest-darwin-amd64)
 
 Deis (pronounced DAY-iss) Workflow is an open source Platform as a Service (PaaS) that adds a
 developer-friendly layer to any [Kubernetes](http://kubernetes.io) cluster, making it easy to
