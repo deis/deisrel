@@ -30,8 +30,4 @@ test:
 build-cli-cross:
 	${DEV_ENV_CMD} gox -output="bin/${SHORT_NAME}-${VERSION}-{{.OS}}-{{.Arch}}"
 
-prep-bintray-json:
-	@jq '.version.name |= "$(VERSION)"' _scripts/ci/bintray-template.json \
-		> _scripts/ci/bintray-ci.json
-
 dist: build-cli-cross
