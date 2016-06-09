@@ -37,7 +37,7 @@ test-docker:
 	${DEV_ENV_CMD} sh -c '${GO_TEST_CMD}'
 
 build-cli-cross:
-	${DEV_ENV_CMD} gox -output="bin/${SHORT_NAME}-${VERSION}-{{.OS}}-{{.Arch}}"
+	${DEV_ENV_CMD} gox -output="bin/${VERSION}/${SHORT_NAME}-${VERSION}-{{.OS}}-{{.Arch}}"
 	${DEV_ENV_CMD} gox -output="bin/${SHORT_NAME}-latest-{{.OS}}-{{.Arch}}"
 
 dist: build-cli-cross
