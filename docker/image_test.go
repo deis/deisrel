@@ -43,13 +43,17 @@ func TestParseImageFromName(t *testing.T) {
 }
 
 func TestParseImageFromRepoAndSha(t *testing.T) {
-	registries := []string{"", "quay.io"}
+	registries := []string{"", DockerHubRegistry, "quay.io"}
 	const org = "regorg"
 	ras := git.RepoAndSha{Name: "testRepo", SHA: "testSHA"}
 	imgs, err := ParseImageFromRepoAndSha(registries, org, ras)
 	assert.NoErr(t, err)
 	assert.Equal(t, len(imgs), len(registries), "number of returned images")
 	for i, img := range imgs {
-		assert.Equal(t, img.registry, registries[i], fmt.Sprintf("registry for image %d", i))
+		expectedReg := registries[i]
+		if expectedReg == DockerHubRegistry {
+			expectedReg = ""
+		}
+		assert.Equal(t, img.registry, expectedReg, fmt.Sprintf("registry for image %d", i))
 	}
 }
