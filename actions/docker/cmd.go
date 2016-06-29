@@ -38,7 +38,7 @@ func Command(ghClient *github.Client, dockerCl docker.Client) cli.Command {
 					cli.StringSliceFlag{
 						Name:  registriesFlag,
 						Value: &defaultDockerRegistriesStringSlice,
-						Usage: "The docker registries to tag and push to. An empty string means the docker hub",
+						Usage: "The docker registries to tag and push to. Use 'index.docker.io' to indicate the docker hub",
 					},
 				},
 				Action: retagCmd(ghClient, dockerCl),

@@ -7,6 +7,10 @@ import (
 	"github.com/deis/deisrel/git"
 )
 
+const (
+	DockerHubRegistry = "index.docker.io"
+)
+
 // ErrInvalidImageName is the error returned when a func couldn't parse a string into an
 // Image struct
 type ErrInvalidImageName struct {
@@ -65,7 +69,8 @@ func ParseImageFromName(name string) (*Image, error) {
 }
 
 // ParseImageFromRepoAndSha attempts to convert ras into a set of docker images, each of which
-// points to a registry in registries and uses dockerRegistryOrg.
+// points to a registry in registries and uses dockerRegistryOrg. Any registry that matches
+// DockerHubRegistry will be converted to empty
 func ParseImageFromRepoAndSha(
 	dockerRegistries []string,
 	dockerRegistryOrg string,
@@ -74,6 +79,9 @@ func ParseImageFromRepoAndSha(
 	ret := make([]*Image, len(dockerRegistries))
 	for i, reg := range dockerRegistries {
 		str := fmt.Sprintf("%s/%s:git-%s", dockerRegistryOrg, ras.Name, ras.ShortSHA())
+		if reg == DockerHubRegistry {
+			reg = ""
+		}
 		if reg != "" {
 			// prepend the registry if it's non-empty
 			str = fmt.Sprintf("%s/%s", reg, str)

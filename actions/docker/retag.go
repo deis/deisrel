@@ -18,7 +18,7 @@ const (
 )
 
 var (
-	defaultDockerRegistriesStringSlice = cli.StringSlice([]string{"", "quay.io"})
+	defaultDockerRegistriesStringSlice = cli.StringSlice([]string{docker.DockerHubRegistry, "quay.io"})
 )
 
 func getAllReposAndShas(
