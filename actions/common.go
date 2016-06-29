@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"text/template"
 
 	"github.com/deis/deisrel/git"
 )
@@ -36,12 +35,6 @@ const (
 	generateParamsFileName = "generate_params.toml"
 )
 
-type helmChart struct {
-	Name     string
-	Template *template.Template
-	Files    []string
-}
-
 type releaseName struct {
 	Full  string
 	Short string
@@ -66,40 +59,6 @@ var (
 		Short: os.Getenv("WORKFLOW_RELEASE_SHORT"),
 	}
 	defaultStagingPath = getFullPath("staging")
-
-	// RouterChart represents the router chart and its files needing updating
-	// for a release
-	RouterChart = helmChart{
-		Name:     "router-dev",
-		Template: generateParamsRouterTpl,
-		Files: []string{
-			"README.md",
-			"Chart.yaml",
-		},
-	}
-
-	// WorkflowChart represents the workflow chart and its files needing updating
-	// for a release
-	WorkflowChart = helmChart{
-		Name:     "workflow-dev",
-		Template: generateParamsTpl,
-		Files: []string{
-			"README.md",
-			"Chart.yaml",
-		},
-	}
-
-	// WorkflowE2EChart represents the workflow e2e chart and its files needing updating
-	// for a release
-	WorkflowE2EChart = helmChart{
-		Name:     "workflow-dev-e2e",
-		Template: generateParamsE2ETpl,
-		Files: []string{
-			"README.md",
-			"Chart.yaml",
-			filepath.Join("tpl", "generate_params.toml"),
-		},
-	}
 )
 
 func getFullPath(dirName string) string {

@@ -9,6 +9,7 @@ import (
 	"github.com/arschles/sys"
 	"github.com/codegangsta/cli"
 	"github.com/deis/deisrel/git"
+	"github.com/deis/deisrel/helm"
 	"github.com/google/go-github/github"
 )
 
@@ -17,7 +18,7 @@ var (
 	ourFP = sys.RealFP()
 )
 
-func helmStage(ghClient *github.Client, c *cli.Context, helmChart helmChart) {
+func helmStage(ghClient *github.Client, c *cli.Context, helmChart helm.Chart) {
 	var opt github.RepositoryContentGetOptions
 	opt.Ref = c.GlobalString(RefFlag)
 	org := c.GlobalString(GHOrgFlag)
@@ -33,12 +34,17 @@ func helmStage(ghClient *github.Client, c *cli.Context, helmChart helmChart) {
 	}
 
 	// stage 'tpl/generate_params.toml' with latest git shas for each component
-	defaultParamsComponentAttrs := genParamsComponentAttrs{
+	defaultParamsComponentAttrs := helm.GenParamsComponentAttrs{
 		Org:        c.GlobalString(OrgFlag),
 		PullPolicy: c.GlobalString(PullPolicyFlag),
 		Tag:        c.GlobalString(TagFlag),
 	}
-	paramsComponentMap := getParamsComponentMap(ghClient, defaultParamsComponentAttrs, helmChart.Template, c.GlobalString(RefFlag))
+	paramsComponentMap := getParamsComponentMap(
+		ghClient,
+		defaultParamsComponentAttrs,
+		helmChart,
+		c.GlobalString(RefFlag),
+	)
 	generateParams(ourFS, stagingDir, paramsComponentMap, helmChart)
 
 	// gather helmChart.Files from GitHub needing release string updates
@@ -70,7 +76,7 @@ func downloadFiles(
 	org,
 	repo string,
 	opt *github.RepositoryContentGetOptions,
-	helmChart helmChart) ([]git.File, error) {
+	helmChart helm.Chart) ([]git.File, error) {
 
 	ret := make([]git.File, 0, len(helmChart.Files))
 	for _, fileName := range helmChart.Files {

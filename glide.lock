@@ -1,5 +1,5 @@
-hash: a880ec9ffd6a2c21a7c8bdd58e61d2e7582f8fa116c9ac386a31f976ae6543e9
-updated: 2016-06-20T10:49:52.366918441-07:00
+hash: e89f40b83149a1608da0406a15941bdd21b7c06a814d41932ac1573c81449ebf
+updated: 2016-06-29T15:40:46.17735934-07:00
 imports:
 - name: context
   version: 76e74a336561c500a376b406eb649727eeb3477f
@@ -11,6 +11,8 @@ imports:
   version: 5c22e2eba944d89ddd5c81b2c4175e64ee828503
 - name: github.com/arschles/sys
   version: 8b5b83f3e61dcad5f1012c4b3ae5db14c05f14a2
+- name: github.com/BurntSushi/toml
+  version: f0aeabca5a127c4078abb8c8d64298b147264b55
 - name: github.com/codegangsta/cli
   version: 75b97d09d9f5792ff997e249a330a3ca28f8b537
 - name: github.com/docker/docker
