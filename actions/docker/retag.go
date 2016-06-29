@@ -3,6 +3,7 @@ package docker
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/codegangsta/cli"
 	"github.com/deis/deisrel/actions"
@@ -12,9 +13,14 @@ import (
 )
 
 const (
-	newOrgFlag    = "new-org"
-	defaultNewOrg = "deis"
+	newOrgFlag     = "new-org"
+	defaultNewOrg  = "deis"
+	registriesFlag = "registries"
 )
+
+func getDockerRegistries(str string) []string {
+	return strings.Split(str, ",")
+}
 
 func getAllReposAndShas(
 	ghClient *github.Client,
@@ -96,6 +102,7 @@ func retagCmd(ghClient *github.Client, dockerCl docker.Client) func(c *cli.Conte
 		shaFilepath := c.String(actions.ShaFilepathFlag)
 		ref := c.String(actions.RefFlag)
 		promptPush := !c.Bool(actions.YesFlag)
+		registries := getDockerRegistries(c.String(registriesFlag))
 
 		allReposAndShas, err := getAllReposAndShas(ghClient, shaFilepath, ref)
 		if err != nil {
@@ -104,7 +111,7 @@ func retagCmd(ghClient *github.Client, dockerCl docker.Client) func(c *cli.Conte
 
 		repoAndShaList := git.NewRepoAndShaListFromSlice(allReposAndShas)
 		repoAndShaList.Sort()
-		images, err := docker.ParseImagesFromRepoAndShaList(docker.DeisCIDockerOrg, repoAndShaList)
+		images, err := docker.ParseImagesFromRepoAndShaList(registries, docker.DeisCIDockerOrg, repoAndShaList)
 		if err != nil {
 			log.Fatalf("Error parsing docker images (%s)", err)
 		}

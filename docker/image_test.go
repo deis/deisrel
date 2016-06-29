@@ -1,7 +1,11 @@
 package docker
 
 import (
+	"fmt"
 	"testing"
+
+	"github.com/arschles/assert"
+	"github.com/deis/deisrel/git"
 )
 
 func createTestImages() []*Image {
@@ -35,5 +39,17 @@ func TestParseImageFromName(t *testing.T) {
 			t.Errorf("case %d expected %s but got %s", i, *testCase.Expected, *parsed)
 			continue
 		}
+	}
+}
+
+func TestParseImageFromRepoAndSha(t *testing.T) {
+	registries := []string{"", "quay.io"}
+	const org = "regorg"
+	ras := git.RepoAndSha{Name: "testRepo", SHA: "testSHA"}
+	imgs, err := ParseImageFromRepoAndSha(registries, org, ras)
+	assert.NoErr(t, err)
+	assert.Equal(t, len(imgs), len(registries), "number of returned images")
+	for i, img := range imgs {
+		assert.Equal(t, img.registry, registries[i], fmt.Sprintf("registry for image %d", i))
 	}
 }
