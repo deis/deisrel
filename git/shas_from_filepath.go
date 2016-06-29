@@ -7,7 +7,9 @@ import (
 	"strings"
 )
 
-// GetShasFromFilepath opens the file at path and reads all the git repos and SHAs in the file. Returns a slice of all the RepoAndShas that correspond to each entry in the file, or an empty slice and non-nil error if there was any error
+// GetShasFromFilepath opens the file at path and reads all the git repos and SHAs in the file.
+// Returns a slice of all the RepoAndShas that correspond to each entry in the file, or an empty
+// slice and non-nil error if there was any error
 func GetShasFromFilepath(path string) ([]RepoAndSha, error) {
 	ret := []RepoAndSha{}
 	file, err := os.Open(path)

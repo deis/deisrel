@@ -17,7 +17,10 @@ func (e ErrPullImage) Error() string {
 	return fmt.Sprintf("pulling image %s (%s)", *e.Img, strings.TrimSpace(e.Err.Error()))
 }
 
-// PullImages pulls each image in images concurrently. The first returned channel receives on each image successfully pulled, and the second receives on each image that failed to pull for any reason. The total recieves across both channels will equal len(images), and the third channel will be closed only after all of those receives occur.
+// PullImages pulls each image in images concurrently. The first returned channel receives on
+// each image successfully pulled, and the second receives on each image that failed to pull
+// for any reason. The total recieves across both channels will equal len(images), and the
+// third channel will be closed only after all of those receives occur.
 func PullImages(cl Client, images []*Image) (<-chan Image, <-chan ErrPullImage, <-chan struct{}) {
 	succCh := make(chan Image)
 	errCh := make(chan ErrPullImage)

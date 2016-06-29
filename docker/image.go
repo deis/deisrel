@@ -7,7 +7,8 @@ import (
 	"github.com/deis/deisrel/git"
 )
 
-// ErrInvalidImageName is the error returned when a func couldn't parse a string into an Image struct
+// ErrInvalidImageName is the error returned when a func couldn't parse a string into an
+// Image struct
 type ErrInvalidImageName struct {
 	Str string
 }
@@ -17,7 +18,8 @@ func (e ErrInvalidImageName) Error() string {
 	return fmt.Sprintf("%s is an invalid image name", e.Str)
 }
 
-// Image represents a single image name, including all information about its registry, repository and tag
+// Image represents a single image name, including all information about its registry,
+// repository and tag
 type Image struct {
 	registry string
 	repo     string
@@ -62,13 +64,16 @@ func ParseImageFromName(name string) (*Image, error) {
 	return nil, ErrInvalidImageName{Str: name}
 }
 
-// ParseImageFromRepoAndSha attempts to convert ras into a docker image, using dockerRegistryOrg as the docker registry
+// ParseImageFromRepoAndSha attempts to convert ras into a docker image, using
+// dockerRegistryOrg as the docker registry
 func ParseImageFromRepoAndSha(dockerRegistryOrg string, ras git.RepoAndSha) (*Image, error) {
 	str := fmt.Sprintf("quay.io/%s/%s:git-%s", dockerRegistryOrg, ras.Name, ras.ShortSHA())
 	return ParseImageFromName(str)
 }
 
-// ParseImagesFromRepoAndShaList returns a slice of parsed Images in the same order as they appear in rasl.Slice(). Returns an empty slice and a non-nil error if any one of the git.RepoAndShas couldn't be parsed
+// ParseImagesFromRepoAndShaList returns a slice of parsed Images in the same order as they
+// appear in rasl.Slice(). Returns an empty slice and a non-nil error if any one of the
+// git.RepoAndShas couldn't be parsed
 func ParseImagesFromRepoAndShaList(dockerRegistryOrg string, rasl *git.RepoAndShaList) ([]*Image, error) {
 	raslSlice := rasl.Slice()
 	ret := make([]*Image, len(raslSlice))

@@ -16,7 +16,11 @@ const (
 	defaultNewOrg = "deis"
 )
 
-func getAllReposAndShas(ghClient *github.Client, shaFilePath, ref string) ([]git.RepoAndSha, error) {
+func getAllReposAndShas(
+	ghClient *github.Client,
+	shaFilePath,
+	ref string,
+) ([]git.RepoAndSha, error) {
 	var allReposAndShas []git.RepoAndSha
 	if shaFilePath != "" {
 		reposFromFile, err := git.GetShasFromFilepath(shaFilePath)
@@ -55,7 +59,12 @@ func retagAll(dockerCl docker.Client, imageTagPairs []docker.ImageTagPair) {
 		case pair := <-pairsCh:
 			fmt.Printf("re-tagged %s to %s\n", pair.Source.String(), pair.Target.String())
 		case err := <-errCh:
-			fmt.Printf("error re-tagging %s to %s (%s)\n", err.SourceImage.String(), err.TargetImage.String(), err.Err)
+			fmt.Printf(
+				"error re-tagging %s to %s (%s)\n",
+				err.SourceImage.String(),
+				err.TargetImage.String(),
+				err.Err,
+			)
 		case <-doneCh:
 			return
 		}

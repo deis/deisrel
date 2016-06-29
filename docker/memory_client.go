@@ -4,7 +4,8 @@ import (
 	"sync"
 )
 
-// MemoryClient is a purely in-memory implementation of Client. It's meant for mocking in unit tests. Create one with NewMemoryClient
+// MemoryClient is a purely in-memory implementation of Client. It's meant for mocking in unit
+// tests. Create one with NewMemoryClient, not by manually creating a struct instance
 type MemoryClient struct {
 	lck    *sync.Mutex
 	Pushes []*Image
@@ -12,7 +13,8 @@ type MemoryClient struct {
 	Retags []ImageTagPair
 }
 
-// NewMemoryClient creates a new MemoryClient. Always call this function instead of manually creating a MemoryClient struct
+// NewMemoryClient creates a new MemoryClient. Always call this function instead of manually
+// creating a MemoryClient struct
 func NewMemoryClient() *MemoryClient {
 	return &MemoryClient{lck: new(sync.Mutex)}
 }

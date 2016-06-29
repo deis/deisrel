@@ -6,7 +6,8 @@ type ImageTagPair struct {
 	Target *Image
 }
 
-// CreateImageTagPairsFromTransform returns a slice of ImageTagPairs where each source is images[i] and each target is transform(images[i])
+// CreateImageTagPairsFromTransform returns a slice of ImageTagPairs where each
+// source is images[i] and each target is transform(images[i])
 func CreateImageTagPairsFromTransform(images []*Image, transform func(Image) *Image) []ImageTagPair {
 	ret := make([]ImageTagPair, len(images))
 	for i, img := range images {

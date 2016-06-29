@@ -7,7 +7,9 @@ import (
 	"github.com/google/go-github/github"
 )
 
-// GetSHAs returns a slice of the latest RepoAndSha for each repository, using ghClient. It transforms each SHA that it finds using the transform function. It uses the ref parameter to determine the SHA or branch from which to list commits
+// GetSHAs returns a slice of the latest RepoAndSha for each repository, using ghClient.
+// It transforms each SHA that it finds using the transform function. It uses the ref parameter
+// to determine the SHA or branch from which to list commits
 func GetSHAs(ghClient *github.Client, repos []string, transform func(string) string, ref string) ([]RepoAndSha, error) {
 	outCh := make(chan RepoAndSha)
 	errCh := make(chan error)

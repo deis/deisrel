@@ -30,7 +30,11 @@ func (e ErrTag) Error() string {
 	)
 }
 
-// RetagImages concurrently retags all of the images in pairs. The first returned chan recieves on each image that successfully is retagged and the second on each image that can't be retagged. The total number of receives on the first and second channels will equal len(pairs), and after all receives happen, the 3rd chan will be closed
+// RetagImages concurrently retags all of the images in pairs.
+// The first returned chan recieves on each image that successfully is retagged and
+// the second on each image that can't be retagged.
+// The total number of receives on the first and second channels will equal len(pairs),
+// and after all receives happen, the 3rd chan will be closed
 func RetagImages(cl Client, pairs []ImageTagPair) (<-chan ImageTagPair, <-chan ErrTag, <-chan struct{}) {
 	succCh := make(chan ImageTagPair)
 	errCh := make(chan ErrTag)

@@ -7,7 +7,13 @@ import (
 	"github.com/google/go-github/github"
 )
 
-func MoveMilestone(ghClient *github.Client, repo string, oldMilestoneName string, newMilestoneName string, includeClosed bool) error {
+func MoveMilestone(
+	ghClient *github.Client,
+	repo string,
+	oldMilestoneName string,
+	newMilestoneName string,
+	includeClosed bool,
+) error {
 	is := ghClient.Issues
 	milestones, _, err := is.ListMilestones("deis", repo, &github.MilestoneListOptions{})
 	if err != nil {
