@@ -5,10 +5,10 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"text/template"
 
 	"github.com/arschles/sys"
 	"github.com/deis/deisrel/git"
+	"github.com/deis/deisrel/helm"
 	"github.com/google/go-github/github"
 )
 
@@ -26,14 +26,14 @@ func NopWriteCloser(w io.Writer) io.WriteCloser {
 	return nopWriteCloser{w}
 }
 
-func generateParams(fs sys.FS, whereTo string, paramsComponentMap genParamsComponentMap, helmChart helmChart) error {
+func generateParams(fs sys.FS, whereTo string, paramsComponentMap helm.GenParamsComponentMap, helmChart helm.Chart) error {
 	executeTo, err := executeToStaging(fs, filepath.Join(whereTo, "tpl"))
 	if err != nil {
 		log.Fatalf("Error creating staging file (%s)", err)
 	}
 	defer executeTo.Close()
 
-	return helmChart.Template.Execute(executeTo, paramsComponentMap)
+	return helmChart.RenderGenerateParamsTpl(executeTo, paramsComponentMap)
 }
 
 func executeToStaging(fs sys.FS, stagingSubDir string) (io.WriteCloser, error) {
@@ -41,10 +41,15 @@ func executeToStaging(fs sys.FS, stagingSubDir string) (io.WriteCloser, error) {
 	return fs.Create(filepath.Join(stagingSubDir, generateParamsFileName))
 }
 
-func getParamsComponentMap(ghClient *github.Client, defaultParamsComponentAttrs genParamsComponentAttrs, template *template.Template, ref string) genParamsComponentMap {
-	paramsComponentMap := createParamsComponentMap()
+func getParamsComponentMap(
+	ghClient *github.Client,
+	defaultParamsComponentAttrs helm.GenParamsComponentAttrs,
+	chart helm.Chart,
+	ref string,
+) helm.GenParamsComponentMap {
+	paramsComponentMap := helm.CreateGenParamsComponentMap()
 
-	if template == generateParamsE2ETpl {
+	if chart.Name == "workflow-dev-e2e" {
 		repoNames = []string{"workflow-e2e"}
 		componentNames = []string{"WorkflowE2E"}
 	}
