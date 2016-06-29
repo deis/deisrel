@@ -35,6 +35,11 @@ func Command(ghClient *github.Client, dockerCl docker.Client) cli.Command {
 						Value: "master",
 						Usage: "Optional ref to add to GitHub repo request (can be SHA, branch or tag)",
 					},
+					cli.StringSliceFlag{
+						Name:  registriesFlag,
+						Value: &defaultDockerRegistriesStringSlice,
+						Usage: "The docker registries to tag and push to. An empty string means the docker hub",
+					},
 				},
 				Action: retagCmd(ghClient, dockerCl),
 			},

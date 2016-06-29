@@ -3,7 +3,6 @@ package docker
 import (
 	"fmt"
 	"log"
-	"strings"
 
 	"github.com/codegangsta/cli"
 	"github.com/deis/deisrel/actions"
@@ -18,9 +17,9 @@ const (
 	registriesFlag = "registries"
 )
 
-func getDockerRegistries(str string) []string {
-	return strings.Split(str, ",")
-}
+var (
+	defaultDockerRegistriesStringSlice = cli.StringSlice([]string{"", "quay.io"})
+)
 
 func getAllReposAndShas(
 	ghClient *github.Client,
@@ -102,7 +101,7 @@ func retagCmd(ghClient *github.Client, dockerCl docker.Client) func(c *cli.Conte
 		shaFilepath := c.String(actions.ShaFilepathFlag)
 		ref := c.String(actions.RefFlag)
 		promptPush := !c.Bool(actions.YesFlag)
-		registries := getDockerRegistries(c.String(registriesFlag))
+		registries := c.StringSlice(registriesFlag)
 
 		allReposAndShas, err := getAllReposAndShas(ghClient, shaFilepath, ref)
 		if err != nil {
