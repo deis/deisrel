@@ -48,7 +48,7 @@ func MoveMilestone(
 	defer close(errCh)
 	for _, issue := range oldMilestoneIssues {
 		wg.Add(1)
-		go func(issue *github.Issue) {
+		go func(issue github.Issue) {
 			defer wg.Done()
 			ir := &github.IssueRequest{
 				Milestone: newMilestone.Number,
@@ -80,10 +80,10 @@ func MoveMilestone(
 	}
 }
 
-func getMilestoneFromMilestoneList(milestones []*github.Milestone, milestoneName string) (*github.Milestone, error) {
+func getMilestoneFromMilestoneList(milestones []github.Milestone, milestoneName string) (*github.Milestone, error) {
 	for _, milestone := range milestones {
 		if *milestone.Title == milestoneName {
-			return milestone, nil
+			return &milestone, nil
 		}
 	}
 	return nil, newErrMilestoneNotFound(milestoneName)
