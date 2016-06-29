@@ -67,7 +67,7 @@ func ParseImageFromName(name string) (*Image, error) {
 // ParseImageFromRepoAndSha attempts to convert ras into a docker image, using
 // dockerRegistryOrg as the docker registry
 func ParseImageFromRepoAndSha(dockerRegistryOrg string, ras git.RepoAndSha) (*Image, error) {
-	str := fmt.Sprintf("quay.io/%s/%s:git-%s", dockerRegistryOrg, ras.Name, ras.ShortSHA())
+	str := fmt.Sprintf("quay.io/%s/%s:git-%s", dockerRegistryOrg, ras.Name, ras.SHA)
 	return ParseImageFromName(str)
 }
 

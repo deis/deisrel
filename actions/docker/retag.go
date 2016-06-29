@@ -30,7 +30,7 @@ func getAllReposAndShas(
 		allReposAndShas = reposFromFile
 	}
 
-	reposAndShas, err := git.GetSHAs(ghClient, git.RepoNames(), git.NoTransform, ref)
+	reposAndShas, err := git.GetSHAs(ghClient, git.RepoNames(), git.ShortSHATransformNoErr, ref)
 	if err != nil {
 		return nil, fmt.Errorf("getting all SHAs from HEAD on each repository (%s)", err)
 	}
