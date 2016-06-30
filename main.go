@@ -6,6 +6,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/deis/deisrel/actions"
+	"github.com/deis/deisrel/actions/branches"
 	"github.com/deis/deisrel/actions/docker"
 	dlib "github.com/deis/deisrel/docker"
 	"github.com/google/go-github/github"
@@ -34,6 +35,7 @@ func main() {
 	app.Version = version
 	app.Commands = []cli.Command{
 		docker.Command(ghClient, dockerCl),
+		branches.Command(ghClient),
 		cli.Command{
 			Name: "git",
 			Subcommands: []cli.Command{
