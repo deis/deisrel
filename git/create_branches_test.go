@@ -1,6 +1,7 @@
 package git
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -20,17 +21,8 @@ func TestCreateBranches(t *testing.T) {
 	defer ts.Close()
 	ts.Mux.HandleFunc(fmt.Sprintf("/repos/%s/%s/git/refs", orgName, repoName), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, r.Method, "POST", "request method")
-		ret := fmt.Sprintf(`
-    {
-      "ref": "refs/heads/%s",
-      "url": "https://api.github.com/repos/%s/%s/git/refs/heads/%s",
-      "object": {
-        "type": "commit",
-        "sha": "%s",
-        "url": "https://api.github.com/repos/%s/%s/git/commits/%s"
-      }
-    }`, branch, orgName, repoName, branch, commit, orgName, repoName, commit)
-		fmt.Fprintf(w, ret)
+		retRef := newBranchReference(orgName, repoName, branch, commit)
+		assert.NoErr(t, json.NewEncoder(w).Encode(retRef))
 	})
 
 	rasl := []RepoAndSha{

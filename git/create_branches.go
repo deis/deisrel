@@ -21,10 +21,11 @@ func CreateBranches(ghClient *github.Client, branchName string, reposAndSHAs []R
 		wg.Add(1)
 		go func(ras RepoAndSha, refName string) {
 			defer wg.Done()
-			_, _, err := ghClient.Git.CreateRef("deis", ras.Name, &github.Reference{
-				Ref: &refName,
-			})
-			if err != nil {
+			if _, _, err := ghClient.Git.CreateRef(
+				"deis",
+				ras.Name,
+				newBranchReference("deis", ras.Name, branchName, ras.SHA),
+			); err != nil {
 				errCh <- err
 				return
 			}
