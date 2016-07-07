@@ -3,7 +3,6 @@ package config
 import (
 	"io"
 	"io/ioutil"
-	"os"
 
 	"gopkg.in/yaml.v2"
 )
@@ -17,18 +16,6 @@ const (
 // from each repository to the components that it holds
 type RepoToComponentNamesFile struct {
 	RepoToComponentNames map[string][]string `yaml:"repoToComponentNames"`
-}
-
-// DecodeDefaultRepoToComponentNames attempts to open & decode DefaultRepoNamesFile. Returns an
-// appropriate error if the file couldn't be opened or decoded properly. The caller is not
-// responsible for dealing with the mechanics (closing, opening, etc...) of the file at all.
-func DecodeDefaultRepoToComponentNames() (*RepoToComponentNamesFile, error) {
-	fd, err := os.Open(DefaultRepoNamesFile)
-	if err != nil {
-		return nil, err
-	}
-	defer fd.Close()
-	return DecodeRepoToComponentNames(fd)
 }
 
 // DecodeRepoToComponentNames decodes yamlFile into a RepoToComponentNamesFile. If there was

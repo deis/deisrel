@@ -6,7 +6,8 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/deis/deisrel/git"
+	"github.com/codegangsta/cli"
+	"github.com/deis/deisrel/config"
 )
 
 const (
@@ -30,6 +31,8 @@ const (
 	StagingDirFlag = "stagingDir"
 	// IncludeClosed represents the '--includeClosed' flag
 	IncludeClosed = "includeClosed"
+	// ReposFile represents the '--reposFile' flag
+	ReposFile = "reposFile"
 )
 
 const (
@@ -48,18 +51,23 @@ type releaseName struct {
 }
 
 var (
+	ReposFileFlag = cli.StringFlag{
+		Name:  ReposFile,
+		Value: config.DefaultRepoNamesFile,
+		Usage: "The name of the file that holds all repository and component information for this release",
+	}
 	// additionalGitRepoNames represents the repo names lacking representation
 	// in any helm chart, yet still requiring updates during each Workflow
 	// release, including changelog generation and creation of git tags.
-	additionalGitRepoNames = []string{"workflow", "charts"}
+	// additionalGitRepoNames = []string{"workflow", "charts"}
 
-	// allGitRepoNames represent all GitHub repo names needing git-based updates for a release
-	allGitRepoNames = append(git.RepoNames(), additionalGitRepoNames...)
-
-	repoNames      = git.RepoNames()
-	componentNames = git.ComponentNames()
-	// TODO: https://github.com/deis/deisrel/issues/12
-	repoToComponentNames = git.RepoToComponentNames()
+	// // allGitRepoNames represent all GitHub repo names needing git-based updates for a release
+	// allGitRepoNames = append(git.RepoNames(), additionalGitRepoNames...)
+	//
+	// repoNames      = git.RepoNames()
+	// componentNames = git.ComponentNames()
+	// // TODO: https://github.com/deis/deisrel/issues/12
+	// repoToComponentNames = git.RepoToComponentNames()
 
 	deisRelease = releaseName{
 		Full:  os.Getenv("WORKFLOW_RELEASE"),
