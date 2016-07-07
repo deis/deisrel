@@ -1,7 +1,6 @@
 package docker
 
 import (
-	"strconv"
 	"testing"
 
 	"github.com/arschles/assert"
@@ -21,7 +20,12 @@ func TestPushImages(t *testing.T) {
 	errs := PushImages(memCl, images)
 	assert.Equal(t, len(errs), 0, "number of errors")
 	assert.Equal(t, len(memCl.Pushes), len(images), "number of pushes received")
+	pushMap := make(map[string]struct{})
+	for _, push := range memCl.Pushes {
+		pushMap[push.String()] = struct{}{}
+	}
 	for i, img := range images {
-		assert.Equal(t, *img, *memCl.Pushes[i], "pushed image "+strconv.Itoa(i))
+		_, ok := pushMap[img.String()]
+		assert.True(t, ok, "image %d (%s) wasn't pushed", i, img.String())
 	}
 }
