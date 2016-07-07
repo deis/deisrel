@@ -7,6 +7,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/deis/deisrel/changelog"
+	"github.com/deis/deisrel/config"
 	"github.com/google/go-github/github"
 )
 

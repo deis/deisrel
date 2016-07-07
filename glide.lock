@@ -1,5 +1,5 @@
-hash: a880ec9ffd6a2c21a7c8bdd58e61d2e7582f8fa116c9ac386a31f976ae6543e9
-updated: 2016-06-20T10:49:52.366918441-07:00
+hash: f8a9b4e67b7009dd1ca8155489879049fa54acf67d8654f722510fea8caecefc
+updated: 2016-07-06T10:41:16.624874957-07:00
 imports:
 - name: context
   version: 76e74a336561c500a376b406eb649727eeb3477f
@@ -78,4 +78,6 @@ imports:
   - internal/datastore
   - internal/log
   - internal/remote_api
+- name: gopkg.in/yaml.v2
+  version: a83829b6f1293c91addabc89d0571c246397bbf4
 devImports: []
