@@ -16,7 +16,7 @@ func TestNewBranchReference(t *testing.T) {
 	)
 
 	ref := newBranchReference(orgName, repoName, branchName, sha)
-	assert.Equal(t, *ref.Ref, fmt.Sprintf("ref/heads/%s", sha), "sha")
+	assert.Equal(t, *ref.Ref, fmt.Sprintf("refs/heads/%s", branchName), "sha")
 	assert.Equal(
 		t,
 		*ref.URL,
