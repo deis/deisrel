@@ -51,7 +51,6 @@ func MultiRepoVals(client *github.Client, reposAndSHAs []git.RepoAndSha) ([]Repo
 		case rav := <-ravCh:
 			ret = append(ret, rav)
 		case err := <-errCh:
-			close(doneCh)
 			return nil, err
 		case <-doneCh:
 			return ret, nil
