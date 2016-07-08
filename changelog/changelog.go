@@ -1,6 +1,8 @@
 package changelog
 
 import (
+	"bytes"
+	"io"
 	"text/template"
 )
 
@@ -46,6 +48,22 @@ type Values struct {
 	Fixes         []string
 	Documentation []string
 	Maintenance   []string
+}
+
+// RenderTpl renders Tpl to w, using v as the data. If there was a problem rendering, returns a
+// non-nil error and writes nothing to w.
+func (v Values) RenderTpl(w io.Writer) error {
+	return Tpl.Execute(w, v)
+}
+
+// RenderTplToString is a convenience function to render Tpl to a string using v as the data.
+// Returns an empty string and a non-nil error if there was a problem rendering.
+func (v Values) RenderTplToString() (string, error) {
+	b := new(bytes.Buffer)
+	if err := v.RenderTpl(b); err != nil {
+		return "", err
+	}
+	return string(b.Bytes()), nil
 }
 
 // MergeValues merges all of the slices in vals together into a single Values struct which has OldRelease set to oldRel and NewRelease set to newRel
