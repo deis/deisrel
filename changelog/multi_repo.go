@@ -13,21 +13,21 @@ type RepoAndValues struct {
 	Values     *Values
 }
 
-// MultiRepoVals concurrently fetches the changelogs for each repo in reposAndSHAs and returns
-// the RepoAndValues for each of the aforementioned repos. On any failure, returns a nil slice
-// and appropriate error. The ordering of the returned slice is undefined.
-func MultiRepoVals(client *github.Client, reposAndSHAs []git.RepoAndSha) ([]RepoAndValues, error) {
+// MultiRepoVals concurrently fetches the changelogs for each repo in reposAndValues
+// (using SingleRepoVals for each) and returns the RepoAndValues for each of the aforementioned
+// repos. On any failure, returns a nil slice and appropriate error. The ordering of the
+// returned slice is undefined.
+func MultiRepoVals(client *github.Client, reposAndValues []RepoAndValues) ([]RepoAndValues, error) {
 	var wg sync.WaitGroup
 	ravCh := make(chan RepoAndValues)
 	errCh := make(chan error)
 	doneCh := make(chan struct{})
 
-	for _, ras := range reposAndSHAs {
+	for _, rav := range reposAndValues {
 		wg.Add(1)
-		go func(ras git.RepoAndSha) {
+		go func(rav RepoAndValues) {
 			defer wg.Done()
-			vals := new(Values)
-			if _, err := SingleRepoVals(client, vals, ras.SHA, ras.Name, false); err != nil {
+			if _, err := SingleRepoVals(client, rav.Values, rav.RepoAndSHA.SHA, rav.RepoAndSHA.Name, false); err != nil {
 				select {
 				case errCh <- err:
 				case <-doneCh:
@@ -35,10 +35,10 @@ func MultiRepoVals(client *github.Client, reposAndSHAs []git.RepoAndSha) ([]Repo
 				return
 			}
 			select {
-			case ravCh <- RepoAndValues{RepoAndSHA: ras, Values: vals}:
+			case ravCh <- RepoAndValues{RepoAndSHA: rav.RepoAndSHA, Values: rav.Values}:
 			case <-doneCh:
 			}
-		}(ras)
+		}(rav)
 	}
 	go func() {
 		wg.Wait()
