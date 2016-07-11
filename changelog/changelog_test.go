@@ -20,6 +20,17 @@ var (
 	maintenance   = []string{"maint1"}
 )
 
+func createVals() Values {
+	return Values{
+		OldRelease:    "v1.1",
+		NewRelease:    "v1.2",
+		Features:      []string{"feat1", "feat2"},
+		Fixes:         []string{"fix1", "fix2"},
+		Documentation: []string{"doc1", "doc2"},
+		Maintenance:   []string{"maint1", "maint2"},
+	}
+}
+
 func TestTemplate(t *testing.T) {
 	type testCase struct {
 		vals    Values
@@ -108,4 +119,19 @@ func TestMergeValues(t *testing.T) {
 	assert.Equal(t, len(res.Fixes), 1, "length of fixes slice")
 	assert.Equal(t, res.Features, []string{"feat1", "feat2"}, "features slice")
 	assert.Equal(t, res.Fixes, []string{"fix1"}, "fixes slice")
+}
+
+func TestRenderTpl(t *testing.T) {
+	b := new(bytes.Buffer)
+	vals := createVals()
+	assert.NoErr(t, vals.RenderTpl(b))
+}
+
+func TestRenderTplToString(t *testing.T) {
+	b := new(bytes.Buffer)
+	vals := createVals()
+	assert.NoErr(t, vals.RenderTpl(b))
+	resStr, err := vals.RenderTplToString()
+	assert.NoErr(t, err)
+	assert.Equal(t, string(b.Bytes()), resStr, "result string")
 }

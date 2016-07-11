@@ -8,6 +8,7 @@ import (
 	"github.com/deis/deisrel/actions"
 	"github.com/deis/deisrel/actions/branches"
 	"github.com/deis/deisrel/actions/docker"
+	ghaction "github.com/deis/deisrel/actions/github"
 	dlib "github.com/deis/deisrel/docker"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
@@ -36,6 +37,7 @@ func main() {
 	app.Commands = []cli.Command{
 		docker.Command(ghClient, dockerCl),
 		branches.Command(ghClient),
+		ghaction.Command(ghClient),
 		cli.Command{
 			Name: "git",
 			Subcommands: []cli.Command{
