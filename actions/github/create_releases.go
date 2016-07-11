@@ -23,12 +23,14 @@ func createReleasesCmd(ghClient *github.Client) func(c *cli.Context) error {
 		dryRun := c.Bool(actions.YesFlag)
 		ref := c.String(actions.RefFlag)
 		repoNames := git.RepoNames()
-		reposAndSHAs := make([]git.RepoAndSha, len(repoNames))
+		reposAndValues := make([]changelog.RepoAndValues, len(repoNames))
 		for i, repoName := range repoNames {
-			reposAndSHAs[i] = git.RepoAndSha{Name: repoName, SHA: ref}
+			reposAndValues[i] = changelog.RepoAndValues{
+				RepoAndSHA: git.RepoAndSha{Name: repoName, SHA: ref},
+			}
 		}
 		fmt.Println("Fetching changelogs for all repos")
-		repoAndVals, err := changelog.MultiRepoVals(ghClient, reposAndSHAs)
+		repoAndVals, err := changelog.MultiRepoVals(ghClient, reposAndValues)
 		if err != nil {
 			log.Fatalf("Error fetching changelog values (%s)", err)
 		}
