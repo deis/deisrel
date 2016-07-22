@@ -6,9 +6,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/codegangsta/cli"
 	"github.com/deis/deisrel/changelog"
 	"github.com/google/go-github/github"
+	"github.com/urfave/cli"
 )
 
 // GenerateIndividualChangelog is the CLI action for creating a changelog for a single repo

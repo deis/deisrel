@@ -1,12 +1,18 @@
 package changelog
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/deis/deisrel/git"
 	"github.com/google/go-github/github"
+)
+
+var (
+	// ErrSHANotLongEnough is the error returned from various functions in this package when a
+	// given SHA is not long enough for use
+	ErrSHANotLongEnough = errors.New("SHA not long enough")
 )
 
 // SingleRepoVals generates a changelog entry from vals.OldRelease to sha. It returns the commits that were unparseable (and had to be skipped) or any error encountered during the process. On a nil error, vals is filled in with all of the sorted changelog entries. Note that any nil commits will not be in the returned string slice
@@ -27,7 +33,7 @@ func SingleRepoVals(client *github.Client, vals *Values, sha, name string, inclu
 			continue
 		}
 		commitMessage := strings.Split(*commit.Commit.Message, "\n")[0]
-		shortSHA, err := git.ShortSHATransform(*commit.SHA)
+		shortSHA, err := shortSHATransform(*commit.SHA)
 		if err != nil {
 			return nil, err
 		}
@@ -51,4 +57,13 @@ func SingleRepoVals(client *github.Client, vals *Values, sha, name string, inclu
 		}
 	}
 	return skippedCommits, nil
+}
+
+// shortSHATransform returns the shortened version of the given SHA given in s. If the given
+// string is not long enough, returns the empty string and ErrSHANotLongEnough
+func shortSHATransform(s string) (string, error) {
+	if len(s) < 7 {
+		return "", ErrSHANotLongEnough
+	}
+	return s[:7], nil
 }

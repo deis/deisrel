@@ -1,17 +1,7 @@
 package: github.com/deis/deisrel
 import:
-- package: github.com/google/go-github
-  subpackages:
-  - github
-- package: github.com/codegangsta/cli
-- package: golang.org/x/oauth2
-- package: github.com/arschles/sys
-- package: github.com/arschles/assert
-- package: context
-  version: 76e74a336561c500a376b406eb649727eeb3477f
-  repo: https://github.com/golang/net.git
-  vcs: git
-  subpackages:
-  - context
-- package: github.com/fsouza/go-dockerclient
-- package: github.com/hashicorp/go-cleanhttp
+  - package: github.com/BurntSushi/toml
+  - package: github.com/google/go-github
+  - package: golang.org/x/oauth2
+  - package: github.com/urfave/cli
+  - package: github.com/arschles/assert

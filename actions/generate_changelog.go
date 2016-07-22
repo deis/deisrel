@@ -1,24 +1,39 @@
 package actions
 
 import (
+	"encoding/json"
 	"io"
+	"io/ioutil"
 	"log"
 	"sync"
 
-	"github.com/codegangsta/cli"
 	"github.com/deis/deisrel/changelog"
 	"github.com/google/go-github/github"
+	"github.com/urfave/cli"
 )
 
 // GenerateChangelog is the CLI action for creating an aggregated changelog from all of the Deis Workflow repos.
 func GenerateChangelog(client *github.Client, dest io.Writer) func(*cli.Context) error {
 	return func(c *cli.Context) error {
-		oldTag := c.Args().Get(0)
-		newTag := c.Args().Get(1)
-		if oldTag == "" || newTag == "" {
-			log.Fatal("Usage: changelog global <old-release> <new-release>")
+		repoMapFile := c.Args().Get(0)
+		oldTag := c.Args().Get(1)
+		newTag := c.Args().Get(2)
+		if repoMapFile == "" || oldTag == "" || newTag == "" {
+			log.Fatal("Usage: changelog global <repo map> <old-release> <new-release>")
 		}
-		vals, errs := generateChangelogVals(client, oldTag, newTag)
+
+		out, err := ioutil.ReadFile(repoMapFile)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		repoMap := make(map[string][]string)
+		err = json.Unmarshal(out, &repoMap)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		vals, errs := generateChangelogVals(client, repoMap, oldTag, newTag)
 		if len(errs) > 0 {
 			for _, err := range errs {
 				log.Printf("Error: %s", err)
@@ -31,24 +46,24 @@ func GenerateChangelog(client *github.Client, dest io.Writer) func(*cli.Context)
 	}
 }
 
-func generateChangelogVals(client *github.Client, oldTag, newTag string) ([]changelog.Values, []error) {
+func generateChangelogVals(client *github.Client, repoMap map[string][]string, oldTag, newTag string) ([]changelog.Values, []error) {
 	var wg sync.WaitGroup
 	done := make(chan bool)
 	valsCh := make(chan changelog.Values)
 	errCh := make(chan error)
 	defer close(errCh)
-	for _, name := range allGitRepoNames {
+	for repo := range repoMap {
 		wg.Add(1)
-		go func(name string) {
+		go func(repo string) {
 			defer wg.Done()
 			vals := &changelog.Values{OldRelease: oldTag, NewRelease: newTag}
-			_, err := changelog.SingleRepoVals(client, vals, newTag, name, true)
+			_, err := changelog.SingleRepoVals(client, vals, newTag, repo, true)
 			if err != nil {
 				errCh <- err
 				return
 			}
 			valsCh <- *vals
-		}(name)
+		}(repo)
 	}
 	go func() {
 		// wait for all fetches from github to be complete before returning

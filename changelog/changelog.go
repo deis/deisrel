@@ -6,28 +6,23 @@ import (
 
 const (
 	tplStr = `### {{.OldRelease}} -> {{.NewRelease}}
-
 {{ if (len .Features) gt 0 }}
 #### Features
-
 {{range .Features}}- {{.}}
 {{end}}
 {{ end -}}
 {{ if (len .Fixes) gt 0 -}}
 #### Fixes
-
 {{range .Fixes}}- {{.}}
 {{end}}
 {{ end }}
 {{ if (len .Documentation) gt 0 }}
 #### Documentation
-
 {{range .Documentation}}- {{.}}
 {{end}}
 {{end}}
 {{ if (len .Maintenance) gt 0 }}
 #### Maintenance
-
 {{range .Maintenance}}- {{.}}
 {{end}}
 {{end}}`

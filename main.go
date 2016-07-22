@@ -1,181 +1,135 @@
 package main
 
 import (
-	"log"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"os"
+	"sort"
+	"strings"
 
-	"github.com/codegangsta/cli"
+	"github.com/BurntSushi/toml"
 	"github.com/deis/deisrel/actions"
-	"github.com/deis/deisrel/actions/branches"
-	"github.com/deis/deisrel/actions/docker"
-	dlib "github.com/deis/deisrel/docker"
+	"github.com/deis/deisrel/components"
 	"github.com/google/go-github/github"
+	"github.com/urfave/cli"
 	"golang.org/x/oauth2"
 )
 
-const (
-	tokenEnvVarName = "GITHUB_ACCESS_TOKEN"
-)
-
-var version = "0.0.0"
+var version = "0.0.0" // replaced when building
 
 func main() {
-	ghTkn := os.Getenv(tokenEnvVarName)
-	if ghTkn == "" {
-		log.Fatalf("'%s' env var required", tokenEnvVarName)
+	ghclient := github.NewClient(nil)
+
+	if token, ok := os.LookupEnv("GH_TOKEN"); ok {
+		ts := oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: token},
+		)
+		ghclient = github.NewClient(oauth2.NewClient(oauth2.NoContext, ts))
 	}
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: ghTkn})
-	cl := oauth2.NewClient(oauth2.NoContext, ts)
-	ghClient := github.NewClient(cl)
-	dockerCl := dlib.NewCmdClient()
 
 	app := cli.NewApp()
 	app.Name = "deisrel"
-	app.Usage = "Utilities for releasing a new Deis version"
+	app.Usage = "Manage deis workflow releases. If you need to bypass the github ratelimit, add set github oauth token (no permissions required) to $GH_TOKEN"
+	app.UsageText = "deisrel [options] <chart versions> <repo map>"
 	app.Version = version
-	app.Commands = []cli.Command{
-		docker.Command(ghClient, dockerCl),
-		branches.Command(ghClient),
-		cli.Command{
-			Name: "git",
-			Subcommands: []cli.Command{
-				cli.Command{
-					Name:   "shas",
-					Action: actions.GetShas(ghClient),
-					Flags: []cli.Flag{
-						cli.BoolFlag{
-							Name:  actions.ShortFlag,
-							Usage: "Whether to show short 7 character shas",
-						},
-						cli.StringFlag{
-							Name:  actions.RefFlag,
-							Value: "master",
-							Usage: "Optional ref to add to GitHub repo request (can be SHA, branch or tag)",
-						},
-					},
-				},
-				cli.Command{
-					Name:   "tag",
-					Action: actions.GitTag(ghClient),
-					Flags: []cli.Flag{
-						cli.BoolFlag{
-							Name:  actions.YesFlag,
-							Usage: "If true, skip the prompt requesting permission",
-						},
-						cli.StringFlag{
-							Name:  actions.ShaFilepathFlag,
-							Value: "",
-							Usage: "the file path which to read in the shas to release",
-						},
-						cli.StringFlag{
-							Name:  actions.RefFlag,
-							Value: "master",
-							Usage: "Optional ref to add to GitHub repo request (can be SHA, branch or tag)",
-						},
-					},
-				},
-				cli.Command{
-					Name: "milestone",
-					Subcommands: []cli.Command{
-						cli.Command{
-							Name:   "mv",
-							Action: actions.MoveMilestone(ghClient),
-							Flags: []cli.Flag{
-								cli.BoolFlag{
-									Name:  actions.YesFlag,
-									Usage: "If true, skip the prompt requesting permission",
-								},
-								cli.BoolFlag{
-									Name:  actions.IncludeClosed,
-									Usage: "If true, moved closed issues as well as open ones",
-								},
-							},
-						},
-					},
-				},
-			},
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "output, o",
+			Value: "pretty",
+			Usage: "format to print output in. Valid options: [pretty, json]",
 		},
+	}
+	app.Commands = []cli.Command{
 		cli.Command{
 			Name: "changelog",
 			Subcommands: []cli.Command{
 				cli.Command{
 					Name:        "global",
-					Action:      actions.GenerateChangelog(ghClient, os.Stdout),
-					Usage:       "deisrel changelog global <old-release> <new-release>",
+					Action:      actions.GenerateChangelog(ghclient, os.Stdout),
+					Usage:       "deisrel changelog global <repo map> <old-release> <new-release>",
 					Description: "Aggregate changelog entries from all known repositories for a specified release",
 				},
 				cli.Command{
 					Name:        "individual",
-					Action:      actions.GenerateIndividualChangelog(ghClient, os.Stdout),
+					Action:      actions.GenerateIndividualChangelog(ghclient, os.Stdout),
 					Usage:       "deisrel changelog individual <repo-name> <old-release> <sha> <new-release>",
 					Description: "Generate a changelog entry for an changes on an individual repository, from a specified old release through a specified git SHA. The release will be called the specified new release in the changelog's title",
 				},
 			},
 		},
-		cli.Command{
-			Name: "helm-stage",
-			Flags: []cli.Flag{
-				cli.StringFlag{
-					Name:  actions.TagFlag,
-					Value: "",
-					Usage: "The Docker tag to apply for all images. If empty, defaults to 'git-$SHORT_SHA' for each respective component",
-				},
-				cli.StringFlag{
-					Name:  actions.PullPolicyFlag,
-					Value: "IfNotPresent",
-					Usage: "The 'imagePullPolicy' value to set on each image",
-				},
-				cli.StringFlag{
-					Name:  actions.OrgFlag,
-					Value: "deisci",
-					Usage: "The docker repository organization to set on each image",
-				},
-				cli.StringFlag{
-					Name:  actions.RepoFlag,
-					Value: "charts",
-					Usage: "The GitHub repo name to grab chart from",
-				},
-				cli.StringFlag{
-					Name:  actions.RefFlag,
-					Value: "master",
-					Usage: "Optional ref to add to GitHub repo request (can be SHA, branch or tag)",
-				},
-				cli.StringFlag{
-					Name:  actions.GHOrgFlag,
-					Value: "deis",
-					Usage: "The GitHub org to find repo in",
-				},
-				cli.StringFlag{
-					Name:  actions.StagingDirFlag,
-					Value: "",
-					Usage: "The location to stage chart files",
-				},
-			},
-			Subcommands: []cli.Command{
-				cli.Command{
-					Name:        "e2e",
-					Action:      actions.HelmStageE2E(ghClient),
-					Description: "Stages workflow-dev-e2e, amending with $WORKFLOW_RELEASE_SHORT if defined",
-				},
-				cli.Command{
-					Name:        "router",
-					Action:      actions.HelmStageRouter(ghClient),
-					Description: "Stages router-dev, amending with $WORKFLOW_RELEASE_SHORT if defined",
-				},
-				cli.Command{
-					Name:        "workflow",
-					Action:      actions.HelmStageWorkflow(ghClient),
-					Description: "Stages workflow-dev, amending with $WORKFLOW_RELEASE_SHORT if defined",
-				},
-			},
-			Description: `Stages chart files into staging.
-			To amend files with values pertinent to a release, user must export the following env variables:
-			$WORKFLOW_RELEASE=<full_semver_release_string>, i.e. 'v1.0.0-alpha1'
-			$WORKFLOW_RELEASE_SHORT=<short_form_release_string>, i.e. 'alpha1'`,
-		},
 	}
 
-	if err := app.Run(os.Args); err != nil {
-		os.Exit(1)
+	app.Action = func(c *cli.Context) error {
+		res := make(map[string]interface{})
+
+		if c.NArg() < 2 {
+			return cli.NewExitError("A params and a repo mapping file is required", 1)
+		}
+
+		out, err := ioutil.ReadFile(c.Args().Get(0))
+		if err != nil {
+			return cli.NewExitError(err.Error(), 2)
+		}
+
+		err = toml.Unmarshal(out, &res)
+		if err != nil {
+			return cli.NewExitError(err.Error(), 3)
+		}
+
+		mapping := make(map[string][]string)
+		out, err = ioutil.ReadFile(c.Args().Get(1))
+		if err != nil {
+			return cli.NewExitError(err.Error(), 2)
+		}
+		err = json.Unmarshal(out, &mapping)
+		if err != nil {
+			return cli.NewExitError(err.Error(), 3)
+		}
+
+		versions, err := components.CheckVersions(res, mapping, ghclient)
+		if err != nil {
+			return cli.NewExitError(err.Error(), 4)
+		}
+
+		sort.Sort(components.ByName(versions))
+
+		if c.String("output") == "json" {
+			out, err := json.MarshalIndent(versions, "", "  ")
+			if err != nil {
+				return cli.NewExitError(err.Error(), 5)
+			}
+			fmt.Println(string(out))
+		} else if c.String("output") == "pretty" {
+			// Add padding for version name to all output lines up
+			longestName := 0
+			for _, version := range versions {
+				name := len(version.Name)
+
+				if name > longestName {
+					longestName = name
+				}
+			}
+
+			for _, version := range versions {
+				cleanMsg := "clean"
+				if !version.Clean {
+					cleanMsg = "dirty"
+				}
+
+				padding := strings.Repeat(" ", longestName-len(version.Name))
+
+				fmt.Printf("%s%s %s -> %s (%s)\n", version.Name, padding, version.ChartVersion, version.ComponentVersion, cleanMsg)
+				if !version.Clean {
+					fmt.Printf("\t%s has unrelased changes. See %s\n", version.Name, version.Diff)
+				}
+			}
+		} else {
+			return cli.NewExitError(fmt.Sprintf("Unrecognized output format: %s", c.String("output")), 1)
+		}
+
+		return nil
 	}
+
+	app.Run(os.Args)
 }

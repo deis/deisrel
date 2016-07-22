@@ -18,9 +18,7 @@ We welcome your input! If you have feedback, please [submit an issue][issues]. I
 
 # About
 
-`deisrel` is a utility tool for automating Deis product releases. The idea is that it provides a
-way to automate the release process for Deis Workflow without human intervention, eventually being
-able to automate the release process through a Continuous Integration server like <https://ci.deis.io/>.
+`deisrel` is a utility tool for assisting with Deis product releases. It makes is easy to check what components need to be released before making a workflow release.
 
 # Installing deisrel
 
@@ -42,15 +40,63 @@ Once done, you can then move the client binary anywhere on your PATH:
 
 # Usage
 
-In order to use `deisrel`, you must first add a [GitHub access token](https://github.com/settings/tokens) to your environment:
+deisrel requires two files, the `generate_params.toml` file from [deis/charts](https://github.com/deis/charts), and a repository mapping file, allowing deisrel to map between a repository and the component name.
 
-	$ export GITHUB_ACCESS_TOKEN="myaccesstoken"
+Since the deis repositories are changing rapidly, right now the repository mapping file should be manually created.
 
-Then use `deisrel help` to explore the commands more in-depth.
+Here's an example file:
 
-For example, to generate an aggregated changelog for [Deis Workflow][workflow]:
+```json
+{
+  "builder": ["builder"],
+  "controller": ["controller"],
+  "dockerbuilder": ["dockerbuilder"],
+  "fluentd": ["fluentd"],
+  "monitor": ["influxdb", "grafana", "telegraf"],
+  "logger": ["logger"],
+  "minio": ["minio"],
+  "nsq": ["nsqd"],
+  "postgres": ["database"],
+  "redis": ["loggerRedis"],
+  "registry": ["registry"],
+  "router": ["router"],
+  "slugbuilder": ["slugbuilder"],
+  "slugrunner": ["slugrunner"],
+  "workflow-manager": ["workflowManager"]
+}
+```
 
-	$ deisrel changelog global v2.0.0-beta3 v2.0.0-beta4
+The key is the repository name, and the values are the names of components using that repository, as found in the `generate_params.toml` file.
+
+With these two files, you can use deisrel to generate a report:
+
+```console
+$ deisrel path/to/generate_params.toml path/to/repomapping.json
+builder         v2.2.0 -> v2.2.0 (dirty)
+	builder has unrelased changes. See https://github.com/deis/builder/compare/v2.2.0...master
+controller      v2.2.0 -> v2.2.1 (dirty)
+	controller has unrelased changes. See https://github.com/deis/controller/compare/v2.2.1...master
+database        v2.2.0 -> v2.2.0 (clean)
+dockerbuilder   v2.2.0 -> v2.2.0 (clean)
+fluentd         v2.2.0 -> v2.2.0 (clean)
+grafana         v2.2.0 -> v2.2.0 (clean)
+influxdb        v2.2.0 -> v2.2.0 (clean)
+logger          v2.2.0 -> v2.2.0 (clean)
+loggerRedis     v2.2.0 -> v2.2.0 (clean)
+minio           v2.2.0 -> v2.2.0 (clean)
+nsqd            v2.2.0 -> v2.2.0 (clean)
+registry        v2.2.0 -> v2.2.0 (clean)
+router          v2.2.0 -> v2.2.0 (clean)
+slugbuilder     v2.2.0 -> v2.2.0 (clean)
+slugrunner      v2.2.0 -> v2.2.0 (clean)
+telegraf        v2.2.0 -> v2.2.0 (clean)
+workflowManager v2.2.0 -> v2.2.0 (clean)
+```
+
+It's also possible to output the report in json using the `-o json` argument for easier machine parsing.
+
+Github has a very low ratelimit for unauthenticated api requests. A personal oauth token can be used to bypass this restriction. Create an oauth token with no permission and set it to `$GH_TOKEN` and deisrel will
+use it when making requests.
 
 # Development
 
