@@ -56,7 +56,13 @@ func CheckVersions(chart map[string]interface{}, repositoryMap map[string][]stri
 }
 
 func getChartVersion(chart map[string]interface{}, component string) string {
-	return chart[component].(map[string]interface{})["dockerTag"].(string)
+	if v, ok := chart[component]; ok {
+		if v, ok := v.(map[string]interface{})["dockerTag"]; ok {
+			return v.(string)
+		}
+	}
+
+	return "unknown"
 }
 
 func getRespositoryVersion(client *github.Client, repo string) (string, error) {
