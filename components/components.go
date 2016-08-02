@@ -84,7 +84,18 @@ func checkTag(client *github.Client, repo, tagName string) (bool, error) {
 		return false, err
 	}
 
-	tag, _, err := client.Git.GetRef("deis", repo, "refs/tags/"+tagName)
+	object, _, err := client.Git.GetRef("deis", repo, "refs/tags/"+tagName)
+	if err != nil {
+		return false, err
+	}
+
+	// If tag is a light tag, return the object iteself
+	if *object.Object.Type != "tag" {
+		return *master.Commit.SHA == *object.Object.SHA, nil
+	}
+
+	// If tag is an annotated tag, return the object it points to.
+	tag, _, err := client.Git.GetTag("deis", repo, *object.Object.SHA)
 	if err != nil {
 		return false, err
 	}
