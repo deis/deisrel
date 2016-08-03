@@ -53,8 +53,18 @@ func main() {
 				cli.Command{
 					Name:        "individual",
 					Action:      actions.GenerateIndividualChangelog(ghclient, os.Stdout),
-					Usage:       "deisrel changelog individual <repo-name> <old-release> <sha> <new-release>",
+					Usage:       "deisrel changelog individual <repo-name> <new-release>",
 					Description: "Generate a changelog entry for an changes on an individual repository, from a specified old release through a specified git SHA. The release will be called the specified new release in the changelog's title",
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name:  "base-tag",
+							Usage: "old tag where changelog starts. Optional, defaults to most recent tag",
+						},
+						cli.StringFlag{
+							Name:  "sha",
+							Usage: "commit that will be tagged in the new release. Optional, defaults to most recent commit on master.",
+						},
+					},
 				},
 			},
 		},
