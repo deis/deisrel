@@ -18,6 +18,7 @@ var (
 	fixes         = []string{"fix1"}
 	documentation = []string{"doc1"}
 	maintenance   = []string{"maint1"}
+	refactor      = []string{"ref1"}
 )
 
 func TestTemplate(t *testing.T) {
@@ -32,6 +33,7 @@ func TestTemplate(t *testing.T) {
 				NewRelease:    newRelease,
 				Features:      features,
 				Fixes:         fixes,
+				Refactors:     refactor,
 				Documentation: documentation,
 				Maintenance:   maintenance,
 			},
@@ -43,6 +45,7 @@ func TestTemplate(t *testing.T) {
 				NewRelease:    newRelease,
 				Features:      nil,
 				Fixes:         fixes,
+				Refactors:     refactor,
 				Documentation: documentation,
 				Maintenance:   maintenance,
 			},
@@ -54,6 +57,7 @@ func TestTemplate(t *testing.T) {
 				NewRelease:    newRelease,
 				Features:      features,
 				Fixes:         nil,
+				Refactors:     refactor,
 				Documentation: documentation,
 				Maintenance:   maintenance,
 			},
@@ -65,6 +69,7 @@ func TestTemplate(t *testing.T) {
 				NewRelease:    newRelease,
 				Features:      features,
 				Fixes:         fixes,
+				Refactors:     refactor,
 				Documentation: nil,
 				Maintenance:   maintenance,
 			},
@@ -76,10 +81,23 @@ func TestTemplate(t *testing.T) {
 				NewRelease:    newRelease,
 				Features:      features,
 				Fixes:         fixes,
+				Refactors:     refactor,
 				Documentation: documentation,
 				Maintenance:   nil,
 			},
 			missing: "#### Maintenance",
+		},
+		testCase{
+			vals: Values{
+				OldRelease:    oldRelease,
+				NewRelease:    newRelease,
+				Features:      features,
+				Fixes:         fixes,
+				Refactors:     nil,
+				Documentation: documentation,
+				Maintenance:   maintenance,
+			},
+			missing: "#### Refactors",
 		},
 	}
 

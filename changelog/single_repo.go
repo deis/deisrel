@@ -46,6 +46,8 @@ func SingleRepoVals(client *github.Client, vals *Values, sha, name string, inclu
 		}
 		if strings.HasPrefix(commitMessage, "feat(") {
 			vals.Features = append(vals.Features, changelogMessage)
+		} else if strings.HasPrefix(commitMessage, "ref(") {
+			vals.Refactors = append(vals.Refactors, changelogMessage)
 		} else if strings.HasPrefix(commitMessage, "fix(") {
 			vals.Fixes = append(vals.Fixes, changelogMessage)
 		} else if strings.HasPrefix(commitMessage, "docs(") || strings.HasPrefix(commitMessage, "doc(") {
