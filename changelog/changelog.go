@@ -7,7 +7,7 @@ import (
 const (
 	tplStr = `### {{.OldRelease}} -> {{.NewRelease}}
 
-{{ if (len .Features) gt 0 -}}
+{{ if (len .Features) gt 0 }}
 #### Features
 
 {{range .Features}}- {{.}}
